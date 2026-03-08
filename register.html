@@ -21,18 +21,15 @@
       <input type="text" name="number" required /><br /><br />
 
       <button type="submit">Register</button>
-      <button id="login">login</button>
+      <button type="button" id="login">Login</button>
     </form>
-    <script>
-      document.getElementById("login").addEventListener("click", login);
-      function login() {
-        document.querySelector("form").style.display = "none";
-        let div = document.createElement("div");
-        div.innerHTML =
-          "<h1>Login Page</h1><label>Username</label><br><input type='text' name='user_name' required><br><br><label>Password</label><br><input type='password' name='password' required><br><br><button type='submit'>Login</button>";
-        document.body.appendChild(div);
-      }
-    </script>
+<script>
+  document.getElementById("login").addEventListener("click", function(){
+     let a = document.createElement("a");
+      a.href = "login.html";
+      a.click();
+  } )
+  </script>
   </body>
 </html>
  
