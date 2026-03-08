@@ -11,7 +11,7 @@ $sql = "INSERT INTO users (user_name, email, password, number)
         VALUES ('$user_name', '$email', '$password', '$number')";
 
 if (mysqli_query($conn, $sql)) {
-     header("Location: ./target.html");
+     header("Location: ../FOR_everyOne/target.html");
 } else {
     echo "Error: " . mysqli_error($conn);
 }
