@@ -1,0 +1,45 @@
+/* ... keep previous styles from the last message ... */
+
+.upload-card {
+    background: #fff;
+    padding: 2rem;
+    border: 2px dashed #cbd5e1;
+    border-radius: 12px;
+    text-align: center;
+    margin-bottom: 2rem;
+    transition: 0.3s;
+}
+
+.upload-card:hover {
+    border-color: #2563eb;
+    background: #f8faff;
+}
+
+#file-input {
+    margin-bottom: 1rem;
+    display: block;
+    width: 100%;
+    cursor: pointer;
+}
+
+.btn-upload {
+    background: #2563eb;
+    color: white;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn-upload:hover {
+    background: #1d4ed8;
+    transform: translateY(-1px);
+}
+
+.error {
+    color: #dc2626;
+    text-align: center;
+    font-weight: 500;
+}

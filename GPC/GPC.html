@@ -1,45 +1,121 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+<title>PDF Subject Extractor</title>
+
+<style>
+
+body{
+font-family:Arial;
+background:#f4f4f4;
+text-align:center;
+}
+
+.container{
+width:700px;
+margin:auto;
+margin-top:40px;
+background:white;
+padding:20px;
+border-radius:10px;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+margin-top:20px;
+}
+
+th,td{
+border:1px solid #ccc;
+padding:10px;
+}
+
+th{
+background:#333;
+color:white;
+}
+
+button{
+padding:10px 20px;
+margin-top:10px;
+cursor:pointer;
+}
+#sem{
+
+margin: 10px;
+display: flex;
+justify-content: space-between;
+
+
+}
+</style>
 </head>
+
 <body>
-    <div class="aiisem">
-        <div id="sem">
-        <input type="checkbox" value="sem1">sem1
-        <input type="file">
-        </div>
 
-        <div id="sem">
-        <input type="checkbox" value="sem2">sem2
-        <input type="file">
-        </div>
+<div class="container">
 
-        <div id="sem">
-        <input type="checkbox" value="sem3">sem3
-        <input type="file">
-        </div>
+<h2>Select Semester</h2>
+<DIV class="semes">
 
-        <div id="sem">
-        <input type="checkbox" value="sem4">sem4
-        <input type="file">
-        </div>
 
-        <div id="sem">
-        <input type="checkbox" value="sem5">sem5
-        <input type="file">
-        </div>
 
-        <div id="sem">
-        <input type="checkbox" value="sem6">sem6
-        <input type="file">
-        </div>
+<div id="sem">
+<input type="checkbox" id="sem" name="semester" value="sem1">sem1
+<input type="file" id="pdfFile">
+</div>
 
-        <button id="aplode"> Aplode </button>
-    </div>
-    
+<div id="sem">
+<input type="checkbox" id="sem" name="semester" value="sem2">sem2
+<input type="file" id="pdfFile">
+</div>
+
+<div id="sem">
+<input type="checkbox" id="sem" name="semester" value="sem3">sem3
+<input type="file" id="pdfFile">
+</div>
+
+<div id="sem">
+<input type="checkbox" id="sem" name="semester" value="sem4">"sem4"
+<input type="file" id="pdfFile">
+</div>
+
+<div id="sem">
+<input type="checkbox" id="sem" name="semester" value="sem5">sem5
+<input type="file" id="pdfFile">
+</div>
+
+<div id="sem">
+<input type="checkbox" id="sem" name="semester" value="sem6">sem6
+<input type="file" id="pdfFile">
+</div>
+
+
+
+
+</DIV>
+
+<br><br>
+
+<button onclick="uploadPDF()">Upload</button>
+
+<table id="resultTable">
+
+<thead>
+<tr>
+<th>Subject</th>
+<th>Theory Hours</th>
+<th>Practical Hours</th>
+</tr>
+</thead>
+
+<tbody></tbody>
+
+</table>
+
+</div>
 
 <script src="gpc.js"></script>
 
