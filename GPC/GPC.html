@@ -1,123 +1,144 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
-<title>PDF Subject Extractor</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GPC - Teacher & Subject Manager</title>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <style>
+        body { font-family: 'Manrope', sans-serif; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
-<style>
-
-body{
-font-family:Arial;
-background:#f4f4f4;
-text-align:center;
-}
-
-.container{
-width:700px;
-margin:auto;
-margin-top:40px;
-background:white;
-padding:20px;
-border-radius:10px;
-}
-
-table{
-width:100%;
-border-collapse:collapse;
-margin-top:20px;
-}
-
-th,td{
-border:1px solid #ccc;
-padding:10px;
-}
-
-th{
-background:#333;
-color:white;
-}
-
-button{
-padding:10px 20px;
-margin-top:10px;
-cursor:pointer;
-}
-#sem{
-
-margin: 10px;
-display: flex;
-justify-content: space-between;
-
-
-}
-</style>
+        /* Semester Card Active States */
+        .sem-card.active {
+            background-color: #2563eb !important;
+            border-color: #2563eb !important;
+            color: white !important;
+        }
+        .sem-card.active .status-text { color: rgba(255, 255, 255, 0.8) !important; }
+        .sem-card.active .sem-label { color: white !important; }
+    </style>
 </head>
+<body class="bg-[#f8fafc] text-[#334155] min-h-screen">
 
-<body>
+    <div class="max-w-7xl mx-auto px-4 py-8">
+        <h1 class="text-3xl font-extrabold text-slate-900 mb-8 flex items-center gap-3">
+            <span class="p-2 bg-blue-600 text-white rounded-xl material-symbols-outlined">school</span>
+            Teacher & Subject Manager
+        </h1>
 
-<div class="container">
+        <div class="grid grid-cols-12 gap-8">
+            <!-- Sidebar: Teacher & Semester Selection -->
+            <div class="col-span-12 lg:col-span-4 space-y-6">
+                
+                <!-- Teacher Management Section -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                    <h2 class="text-blue-600 font-bold mb-4 flex items-center gap-2">
+                        <span class="material-symbols-outlined">person_add</span> Teacher Management
+                    </h2>
+                    <div class="flex gap-2 mb-4">
+                        <input id="teacherInput" type="text" placeholder="Teacher Name" 
+                               class="flex-1 border-slate-200 rounded-xl p-2.5 focus:ring-blue-500 focus:border-blue-500 text-sm">
+                        <button id="addTeacherBtn" class="bg-blue-600 hover:bg-blue-700 text-white p-2.5 rounded-xl transition-all active:scale-95 flex items-center justify-center">
+                            <span class="material-symbols-outlined">add</span>
+                        </button>
+                    </div>
+                    <div id="teacherListUI" class="space-y-2 max-h-60 overflow-y-auto custom-scrollbar pr-1">
+                        <!-- Dynamic Teachers -->
+                    </div>
+                </div>
 
-<h2>Select Semester</h2>
-<DIV class="semes">
+                <!-- Step 1: Select Semesters (Using temp.html style) -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                    <h2 class="text-blue-600 font-bold mb-4 flex items-center gap-2">
+                        <span class="material-symbols-outlined">checklist</span> Step 1: Select Semesters
+                    </h2>
+                    <div class="grid grid-cols-2 gap-4" id="semSelectionContainer">
+                        <!-- Semester Cards -->
+                        <div class="sem-card group cursor-pointer border border-slate-200 rounded-2xl p-4 bg-slate-50 hover:bg-slate-100 transition-all text-center flex flex-col items-center justify-center gap-1" data-semester="1">
+                            <span class="sem-label text-sm font-extrabold text-slate-800">SEM 1</span>
+                            <span class="status-text text-[10px] text-slate-500 font-medium truncate w-full px-2">Not Selected</span>
+                            <input type="checkbox" name="semester" value="1" class="hidden sem-checkbox">
+                            <input type="file" class="hidden pdf-file-input" accept=".pdf" onchange="handleFileSelect(1, this)">
+                        </div>
 
+                        <div class="sem-card group cursor-pointer border border-slate-200 rounded-2xl p-4 bg-slate-50 hover:bg-slate-100 transition-all text-center flex flex-col items-center justify-center gap-1" data-semester="2">
+                            <span class="sem-label text-sm font-extrabold text-slate-800">SEM 2</span>
+                            <span class="status-text text-[10px] text-slate-500 font-medium truncate w-full px-2">Not Selected</span>
+                            <input type="checkbox" name="semester" value="2" class="hidden sem-checkbox">
+                            <input type="file" class="hidden pdf-file-input" accept=".pdf" onchange="handleFileSelect(2, this)">
+                        </div>
 
+                        <div class="sem-card group cursor-pointer border border-slate-200 rounded-2xl p-4 bg-slate-50 hover:bg-slate-100 transition-all text-center flex flex-col items-center justify-center gap-1" data-semester="3">
+                            <span class="sem-label text-sm font-extrabold text-slate-800">SEM 3</span>
+                            <span class="status-text text-[10px] text-slate-500 font-medium truncate w-full px-2">Not Selected</span>
+                            <input type="checkbox" name="semester" value="3" class="hidden sem-checkbox">
+                            <input type="file" class="hidden pdf-file-input" accept=".pdf" onchange="handleFileSelect(3, this)">
+                        </div>
 
-<div id="sem">
-<input type="checkbox" id="sem" name="semester" value="sem1">sem1
-<input type="file" id="pdfFile">
-</div>
+                        <div class="sem-card group cursor-pointer border border-slate-200 rounded-2xl p-4 bg-slate-50 hover:bg-slate-100 transition-all text-center flex flex-col items-center justify-center gap-1" data-semester="4">
+                            <span class="sem-label text-sm font-extrabold text-slate-800">SEM 4</span>
+                            <span class="status-text text-[10px] text-slate-500 font-medium truncate w-full px-2">Not Selected</span>
+                            <input type="checkbox" name="semester" value="4" class="hidden sem-checkbox">
+                            <input type="file" class="hidden pdf-file-input" accept=".pdf" onchange="handleFileSelect(4, this)">
+                        </div>
 
-<div id="sem">
-<input type="checkbox" id="sem" name="semester" value="sem2">sem2
-<input type="file" id="pdfFile">
-</div>
+                        <div class="sem-card group cursor-pointer border border-slate-200 rounded-2xl p-4 bg-slate-50 hover:bg-slate-100 transition-all text-center flex flex-col items-center justify-center gap-1" data-semester="5">
+                            <span class="sem-label text-sm font-extrabold text-slate-800">SEM 5</span>
+                            <span class="status-text text-[10px] text-slate-500 font-medium truncate w-full px-2">Not Selected</span>
+                            <input type="checkbox" name="semester" value="5" class="hidden sem-checkbox">
+                            <input type="file" class="hidden pdf-file-input" accept=".pdf" onchange="handleFileSelect(5, this)">
+                        </div>
 
-<div id="sem">
-<input type="checkbox" id="sem" name="semester" value="sem3">sem3
-<input type="file" id="pdfFile">
-</div>
+                        <div class="sem-card group cursor-pointer border border-slate-200 rounded-2xl p-4 bg-slate-50 hover:bg-slate-100 transition-all text-center flex flex-col items-center justify-center gap-1" data-semester="6">
+                            <span class="sem-label text-sm font-extrabold text-slate-800">SEM 6</span>
+                            <span class="status-text text-[10px] text-slate-500 font-medium truncate w-full px-2">Not Selected</span>
+                            <input type="checkbox" name="semester" value="6" class="hidden sem-checkbox">
+                            <input type="file" class="hidden pdf-file-input" accept=".pdf" onchange="handleFileSelect(6, this)">
+                        </div>
+                    </div>
 
-<div id="sem">
-<input type="checkbox" id="sem" name="semester" value="sem4">"sem4"
-<input type="file" id="pdfFile">
-</div>
+                    <button onclick="uploadPDF()" class="w-full mt-6 bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 px-4 rounded-xl transition-all active:scale-95 shadow-md flex items-center justify-center gap-2">
+                        <span class="material-symbols-outlined font-extrabold">analytics</span> Extract Subjects
+                    </button>
+                    <p class="text-[10px] text-slate-400 mt-2 text-center">Click a semester card to upload its PDF</p>
+                </div>
+            </div>
 
-<div id="sem">
-<input type="checkbox" id="sem" name="semester" value="sem5">sem5
-<input type="file" id="pdfFile">
-</div>
+            <!-- Main Content: Subject Details -->
+            <div class="col-span-12 lg:col-span-8">
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 min-h-[600px] flex flex-col relative">
+                    <div class="flex justify-between items-center mb-6 pb-4 border-b border-slate-100">
+                        <h2 class="text-blue-600 font-bold text-lg flex items-center gap-2">
+                            <span class="material-symbols-outlined">table_chart</span> Subject Details
+                        </h2>
+                        <button onclick="saveChanges()" class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-xl font-bold transition-all active:scale-95 shadow-md flex items-center gap-2">
+                            <span class="material-symbols-outlined">save</span> Save Changes
+                        </button>
+                    </div>
+                    
+                    <div id="tablesContainer" class="space-y-8 flex-1">
+                        <div class="flex flex-col items-center justify-center h-full opacity-40">
+                            <span class="material-symbols-outlined text-6xl mb-2">assignment_ind</span>
+                            <p class="font-medium text-lg text-center">Extract PDF to see subjects</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-<div id="sem">
-<input type="checkbox" id="sem" name="semester" value="sem6">sem6
-<input type="file" id="pdfFile">
-</div>
+    <!-- Notification Toast -->
+    <div id="toast" class="fixed bottom-8 right-8 bg-slate-900 text-white px-6 py-3 rounded-2xl shadow-2xl transition-all transform translate-y-20 opacity-0 z-[100] flex items-center gap-3">
+        <span id="toastIcon" class="material-symbols-outlined text-green-400">check_circle</span>
+        <span id="toastMsg" class="font-medium text-sm"></span>
+    </div>
 
-
-
-
-</DIV>
-
-<br><br>
-
-<button onclick="uploadPDF()">Upload</button>
-
-<table id="resultTable">
-
-<thead>
-<tr>
-<th>Subject</th>
-<th>Theory Hours</th>
-<th>Practical Hours</th>
-</tr>
-</thead>
-
-<tbody></tbody>
-
-</table>
-
-</div>
-
-<script src="gpc.js"></script>
-
+    <script src="gpc.js"></script>
 </body>
 </html>

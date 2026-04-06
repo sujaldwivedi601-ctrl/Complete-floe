@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Precision Architect - Generator</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;800&display=swap"
+      rel="stylesheet"/>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1;display=swap"
+      rel="stylesheet"/>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link rel="stylesheet" href="gen_timTab.css" />
+  </head>
+  <body class="bg-[#dae4ee] font-sans text-[#2d3335] min-h-screen">
+    <header
+      class="h-16 bg-white/80 backdrop-blur-md sticky top-0 z-50 w-full border-b border-slate-200"
+    >
+      <div
+        class="flex justify-between items-center w-full px-5 py-3 max-w-7xl mx-auto h-full"
+      >
+        <div class="text-xl font-extrabold text-[#006ADC] tracking-tighter">
+          Precision Architect
+        </div>
+        <nav class="hidden md:flex items-center gap-4">
+          <a
+            class="font-bold text-sm px-4 py-2 rounded-lg hover:bg-blue-50"
+            href="index.html"
+            >Home</a
+          >
+          <a
+            class="font-bold text-sm text-[#006ADC] bg-blue-50 px-4 py-2 rounded-lg border-b-2 border-[#006ADC]"
+            href="generate_timetable.html"
+            >Generate Time table</a
+          >
+          <a
+            class="font-bold text-sm px-4 py-2 rounded-lg hover:bg-blue-50"
+            href="personal_Timetable.html"
+            >Personal Timetable</a
+          >
+          <button
+            class="ml-4 font-bold text-sm px-5 py-2 rounded-lg border border-slate-200 hover:bg-slate-100"
+          >
+            Logout
+          </button>
+        </nav>
+      </div>
+    </header>
+
+    <main class="max-w-[1440px] mx-auto p-6">
+      <div class="grid grid-cols-12 gap-6">
+        <div class="col-span-12 lg:col-span-4 space-y-6">
+          <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+            <h2 class="text-[#006ADC] font-bold mb-4 flex items-center gap-2">
+              <span class="material-symbols-outlined">person_add</span> Teachers
+            </h2>
+            <div class="flex gap-2">
+              <input
+                id="teacherInput"
+                type="text"
+                placeholder="Teacher Name"
+                class="flex-1 border-slate-200 rounded-xl p-2.5"
+              />
+              <button
+                id="addTeacherBtn"
+                class="bg-[#006ADC] text-white p-2.5 rounded-xl w-12 flex items-center justify-center"
+              >
+                <span class="material-symbols-outlined">add</span>
+              </button>
+            </div>
+            <div
+              id="teacherListUI"
+              class="mt-4 space-y-2 max-h-40 overflow-y-auto custom-scrollbar"
+            ></div>
+          </div>
+
+          <div
+            class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 "
+          >
+            <h2 class="text-[#006ADC] font-bold mb-4 flex items-center gap-2">
+              <span class="material-symbols-outlined">upload_file</span>
+              Semesters
+            </h2>
+            <div
+              class="grid grid-cols-2 sm:grid-cols-3 gap-4"
+              id="semesterGrid"
+            >
+              <div class="sem-row" data-semester="1">
+                <label class="sem-label text-center"><h2>Sem 1</h2></label>
+                <input
+                  type="file"
+                  class="pdf-file-input"
+                  accept=".pdf"
+                  hidden
+                />
+                <div class="file-name">No file selected</div>
+              </div>
+              <div class="sem-row" data-semester="2">
+                <label class="sem-label text-center"><h2>Sem 2</h2></label>
+                <input
+                  type="file"
+                  class="pdf-file-input"
+                  accept=".pdf"
+                  hidden
+                />
+                <div class="file-name">No file selected</div>
+              </div>
+              <div class="sem-row" data-semester="3">
+                <label class="sem-label text-center"><h2>Sem 3</h2></label>
+                <input
+                  type="file"
+                  class="pdf-file-input"
+                  accept=".pdf"
+                  hidden
+                />
+                <div class="file-name">No file selected</div>
+              </div>
+              <div class="sem-row" data-semester="4">
+                <label class="sem-label text-center"><h2>Sem 4</h2></label>
+                <input
+                  type="file"
+                  class="pdf-file-input"
+                  accept=".pdf"
+                  hidden
+                />
+                <div class="file-name">No file selected</div>
+              </div>
+              <div class="sem-row" data-semester="5">
+                <label class="sem-label text-center"><h2>Sem 5</h2></label>
+                <input
+                  type="file"
+                  class="pdf-file-input"
+                  accept=".pdf"
+                  hidden
+                />
+                <div class="file-name">No file selected</div>
+              </div>
+              <div class="sem-row" data-semester="6">
+                <label class="sem-label text-center"><h2>Sem 6</h2></label>
+                <input
+                  type="file"
+                  class="pdf-file-input"
+                  accept=".pdf"
+                  hidden
+                />
+                <div class="file-name">No file selected</div>
+              </div>
+            </div>
+          </div>
+          <button
+            class="w-full mt-4 bg-slate-800 text-white font-bold py-3 rounded-xl"
+            onclick="uploadPDF()"
+          >
+            Extract Data
+          </button>
+        </div>
+
+        <div class="col-span-12 lg:col-span-8">
+          <div
+            class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 min-h-[500px] flex flex-col relative"
+          >
+            <div class="flex justify-between items-center mb-6 border-b pb-4">
+              <h2 class="text-[#006ADC] font-bold text-lg">Subject Details</h2>
+              <button
+                id="gen"
+                class="bg-[#27ae60] hover:bg-green-700 text-white px-8 py-2.5 rounded-xl font-bold shadow-md flex items-center gap-2"
+              >
+                <span class="material-symbols-outlined">auto_awesome</span>
+                Generate Timetable
+              </button>
+            </div>
+
+            <div id="loader" class="loader-wrapper" style="display: none">
+              <div class="loader"></div>
+            </div>
+            <div id="tablesContainer" class="flex-1"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-12 pt-8 border-t border-slate-300">
+        <!-- <h2 class="text-2xl font-extrabold text-slate-800 mb-8 flex items-center gap-3">
+                <span class="p-2 bg-[#006ADC] text-white rounded-lg material-symbols-outlined">dashboard</span>
+                Final Master Timetables
+            </h2> -->
+
+        <div id="timetableContainer" class="flex flex-col gap-10 pb-20"></div>
+      </div>
+    </main>
+
+    <script src="style.js"></script>
+    <!-- <script src="main.js"></script> -->
+  </body>
+</html>
