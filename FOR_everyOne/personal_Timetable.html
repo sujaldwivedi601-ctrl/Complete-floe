@@ -1,155 +1,151 @@
 <!doctype html>
 
 <html class="light" lang="en">
-  <head>
+
+<head>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>Precision Architect - Generator Workshop</title>
-    
-    <link
-      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1;display=swap"
-      rel="stylesheet"
-    />
+
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1;display=swap"
+        rel="stylesheet" />
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <script id="tailwind-config">
-      tailwind.config = {
-        darkMode: "class",
-        theme: {
-          extend: {
-            colors: {
-              "on-background": "#2d3335",
-              "on-primary-container": "#000000",
-              secondary: "#575f72",
-              "on-primary-fixed-variant": "#000b22",
-              "surface-bright": "#f8f9fa",
-              "surface-container": "#ebeef0",
-              "secondary-dim": "#4b5365",
-              "on-surface-variant": "#5a6062",
-              "tertiary-dim": "#5c4c74",
-              "surface-dim": "#d5dbdd",
-              "secondary-fixed-dim": "#ccd4ea",
-              "on-error-container": "#6e0a12",
-              "error-container": "#fa746f",
-              "error-dim": "#67040d",
-              "secondary-container": "#dae2f9",
-              "surface-container-high": "#e5e9eb",
-              background: "#f8f9fa",
-              "on-secondary-container": "#4a5264",
-              "on-error": "#fff7f6",
-              "on-tertiary-container": "#53436c",
-              "tertiary-fixed-dim": "#d5c1f1",
-              "secondary-fixed": "#dae2f9",
-              "on-tertiary-fixed": "#403157",
-              "primary-dim": "#0050a9",
-              "on-secondary-fixed-variant": "#535b6e",
-              "on-primary-fixed": "#000000",
-              "on-secondary-fixed": "#373f51",
-              tertiary: "#685781",
-              "primary-fixed-dim": "#2376e9",
-              "tertiary-fixed": "#e4ceff",
-              "surface-container-low": "#f1f4f5",
-              "surface-container-highest": "#dee3e6",
-              "on-primary": "#f9f8ff",
-              "inverse-on-surface": "#9b9d9e",
-              primary: "#005cc0",
-              "tertiary-container": "#e4ceff",
-              "primary-fixed": "#3784f7",
-              "on-tertiary-fixed-variant": "#5d4d76",
-              surface: "#f8f9fa",
-              "on-tertiary": "#fef7ff",
-              error: "#a83836",
-              "surface-variant": "#dee3e6",
-              "on-surface": "#2d3335",
-              "surface-tint": "#005cc0",
-              "surface-container-lowest": "#ffffff",
-              "inverse-primary": "#498eff",
-              "primary-container": "#3784f7",
-              outline: "#767c7e",
-              "on-secondary": "#f9f8ff",
-              "inverse-surface": "#0c0f10",
-              "outline-variant": "#adb3b5",
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-background": "#2d3335",
+                        "on-primary-container": "#000000",
+                        secondary: "#575f72",
+                        "on-primary-fixed-variant": "#000b22",
+                        "surface-bright": "#f8f9fa",
+                        "surface-container": "#ebeef0",
+                        "secondary-dim": "#4b5365",
+                        "on-surface-variant": "#5a6062",
+                        "tertiary-dim": "#5c4c74",
+                        "surface-dim": "#d5dbdd",
+                        "secondary-fixed-dim": "#ccd4ea",
+                        "on-error-container": "#6e0a12",
+                        "error-container": "#fa746f",
+                        "error-dim": "#67040d",
+                        "secondary-container": "#dae2f9",
+                        "surface-container-high": "#e5e9eb",
+                        background: "#f8f9fa",
+                        "on-secondary-container": "#4a5264",
+                        "on-error": "#fff7f6",
+                        "on-tertiary-container": "#53436c",
+                        "tertiary-fixed-dim": "#d5c1f1",
+                        "secondary-fixed": "#dae2f9",
+                        "on-tertiary-fixed": "#403157",
+                        "primary-dim": "#0050a9",
+                        "on-secondary-fixed-variant": "#535b6e",
+                        "on-primary-fixed": "#000000",
+                        "on-secondary-fixed": "#373f51",
+                        tertiary: "#685781",
+                        "primary-fixed-dim": "#2376e9",
+                        "tertiary-fixed": "#e4ceff",
+                        "surface-container-low": "#f1f4f5",
+                        "surface-container-highest": "#dee3e6",
+                        "on-primary": "#f9f8ff",
+                        "inverse-on-surface": "#9b9d9e",
+                        primary: "#005cc0",
+                        "tertiary-container": "#e4ceff",
+                        "primary-fixed": "#3784f7",
+                        "on-tertiary-fixed-variant": "#5d4d76",
+                        surface: "#f8f9fa",
+                        "on-tertiary": "#fef7ff",
+                        error: "#a83836",
+                        "surface-variant": "#dee3e6",
+                        "on-surface": "#2d3335",
+                        "surface-tint": "#005cc0",
+                        "surface-container-lowest": "#ffffff",
+                        "inverse-primary": "#498eff",
+                        "primary-container": "#3784f7",
+                        outline: "#767c7e",
+                        "on-secondary": "#f9f8ff",
+                        "inverse-surface": "#0c0f10",
+                        "outline-variant": "#adb3b5",
+                    },
+                    fontFamily: {
+                        headline: ["Manrope"],
+                        body: ["Inter"],
+                        label: ["Inter"],
+                    },
+                    borderRadius: {
+                        DEFAULT: "0.25rem",
+                        lg: "0.5rem",
+                        xl: "0.75rem",
+                        full: "9999px",
+                    },
+                },
             },
-            fontFamily: {
-              headline: ["Manrope"],
-              body: ["Inter"],
-              label: ["Inter"],
-            },
-            borderRadius: {
-              DEFAULT: "0.25rem",
-              lg: "0.5rem",
-              xl: "0.75rem",
-              full: "9999px",
-            },
-          },
-        },
-      };
+        };
     </script>
 
     <style>
-      .material-symbols-outlined {
-        font-variation-settings:
-          "FILL" 0,
-          "wght" 400,
-          "GRAD" 0,
-          "opsz" 24;
-        vertical-align: middle;
-      }
-      .glass-panel {
-        background: rgba(255, 255, 255, 0.5);
-        backdrop-filter: blur(12px);
-      }
-      .gradient-button {
-        background: linear-gradient(135deg, #005cc0 0%, #3784f7 100%);
-      }
-      /* No-Line Philosophy: Layout via tonal shifts */
-      body {
-        background-color: #dae4ee;
-        color: #2d3335;
-        -webkit-font-smoothing: antialiased;
-      }
+        .material-symbols-outlined {
+            font-variation-settings:
+                "FILL" 0,
+                "wght" 400,
+                "GRAD" 0,
+                "opsz" 24;
+            vertical-align: middle;
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(12px);
+        }
+
+        .gradient-button {
+            background: linear-gradient(135deg, #005cc0 0%, #3784f7 100%);
+        }
+
+        /* No-Line Philosophy: Layout via tonal shifts */
+        body {
+            background-color: #dae4ee;
+            color: #2d3335;
+            -webkit-font-smoothing: antialiased;
+        }
     </style>
-  </head>
-  <body class="font-body min-h-screen flex flex-col">
+</head>
+
+<body class="font-body min-h-screen flex flex-col">
     <!-- TopNavBar -->
 
     <header
-      class=" h-16 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md sticky top-0 z-10 w-full border-b border-outline-variant/10"
-    >
-      <div
-        class="flex justify-between items-center w-full px-5 py-3 max-w-7xl mx-auto">
-        <div
-          class="text-xl font-extrabold text-[#006ADC] dark:text-blue-400 tracking-tighter font-headline">
-          Precision Architect
+        class=" h-16 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md sticky top-0 z-10 w-full border-b border-outline-variant/10">
+        <div class="flex justify-between items-center w-full px-5 py-3 max-w-7xl mx-auto">
+            <div class="text-xl font-extrabold text-[#006ADC] dark:text-blue-400 tracking-tighter font-headline">
+                Precision Architect
+            </div>
+            <nav class="hidden md:flex items-center gap-4 italic-none">
+                <a class="font-['Manrope'] font-bold text-sm tracking-wide text-[#2d3335] dark:text-slate-300 px-4 py-2 rounded-lg hover:bg-primary/5 hover:text-[#006ADC] transition-all duration-200"
+                    href="index.html">Home</a>
+                <a class="font-['Manrope'] font-bold text-sm tracking-wide text-[#2d3335] dark:text-slate-300 px-4 py-2 rounded-lg hover:bg-primary/5 hover:text-[#006ADC] transition-all duration-200"
+                    href="generate_timetable.html">Generate Timetable</a>
+
+                <a class="font-['Manrope'] font-bold text-sm tracking-wide text-[#006ADC] dark:text-blue-400 bg-primary/10 px-4 py-2 rounded-lg border-b-2 border-[#006ADC]"
+                    href="personal_Timetable.html">Personal Timetable</a>
+
+                <button
+                    class="ml-4 font-['Manrope'] font-bold text-sm tracking-wide text-[#2d3335] dark:text-slate-300 px-5 py-2 rounded-lg border border-outline/20 hover:bg-surface-container-high hover:border-transparent transition-all duration-200">
+                    Logout
+                </button>
+            </nav>
+            <div class="md:hidden">
+                <span class="material-symbols-outlined text-on-surface">menu</span>
+            </div>
         </div>
-        <nav class="hidden md:flex items-center gap-4 italic-none">
-          <a
-            class="font-['Manrope'] font-bold text-sm tracking-wide text-[#2d3335] dark:text-slate-300 px-4 py-2 rounded-lg hover:bg-primary/5 hover:text-[#006ADC] transition-all duration-200"
-            href="index.html">Home</a>
-          <a
-            class="font-['Manrope'] font-bold text-sm tracking-wide text-[#2d3335] dark:text-slate-300 px-4 py-2 rounded-lg hover:bg-primary/5 hover:text-[#006ADC] transition-all duration-200"
-            href="generate_timetable.html">Generate Timetable</a>
-          
-          <a
-            class="font-['Manrope'] font-bold text-sm tracking-wide text-[#006ADC] dark:text-blue-400 bg-primary/10 px-4 py-2 rounded-lg border-b-2 border-[#006ADC]"
-            href="personal_Timetable.html">Personal Timetable</a>
-          
-            <button
-            class="ml-4 font-['Manrope'] font-bold text-sm tracking-wide text-[#2d3335] dark:text-slate-300 px-5 py-2 rounded-lg border border-outline/20 hover:bg-surface-container-high hover:border-transparent transition-all duration-200"
-          >
-            Logout
-          </button>
-        </nav>
-        <div class="md:hidden">
-          <span class="material-symbols-outlined text-on-surface">menu</span>
-        </div>
-      </div>
-      <div
-        class="flex justify-between items-center w-full px-8 py-6 max-w-7xl mx-auto" ></div>
+        <div class="flex justify-between items-center w-full px-8 py-6 max-w-7xl mx-auto"></div>
     </header>
 
 
 
     <h1> this is your personal timetable </h1>
 
-  </body>
+</body>
+
 </html>

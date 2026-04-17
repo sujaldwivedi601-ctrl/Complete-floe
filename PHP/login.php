@@ -1,13 +1,16 @@
 <?php
 // login.php
-session_start(); 
+session_start();
 include "db.php";
+
+// Add error reporting to catch database issues
+mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
 $username = mysqli_real_escape_string($conn, $_POST['user_name']);
 $password = $_POST['password'];
 
-// ✅ FIX: Ensure 'id' is selected in the query
-$sql = "SELECT id, email, password FROM users WHERE user_name='$username'";
+// ✅ FIX: Using user_accounts table instead of users
+$sql = "SELECT id, email, password FROM user_accounts WHERE user_name='$username'";
 $result = mysqli_query($conn, $sql);
 
 if (mysqli_num_rows($result) > 0) {

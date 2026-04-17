@@ -146,14 +146,44 @@ body {
 }
 
 .lunch-cell {
-    background: #fffbeb !important;
-    color: #b45309 !important;
-    font-weight: 900;
+    background: #fff9eb !important;
+    color: #92400e !important;
+    font-weight: 800;
     font-style: italic;
     letter-spacing: 1px;
+    border: 1px solid #fef3c7 !important;
 }
 
-/* --- 5. UTILITIES & ANIMATIONS --- */
+/* --- 5. SLOT TYPES (NEW) --- */
+.theory-slot {
+    background-color: #f0f9ff !important;
+    border: 1px solid #bae6fd !important;
+    color: #0369a1 !important;
+    border-radius: 12px;
+    padding: 10px !important;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.5);
+}
+
+.practical-slot {
+    background-color: #faf5ff !important;
+    border: 1px solid #e9d5ff !important;
+    color: #7e22ce !important;
+    border-radius: 12px;
+    padding: 10px !important;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.5);
+}
+
+.slot-label {
+    display: block;
+    font-size: 9px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-top: 4px;
+    opacity: 0.8;
+}
+
+/* --- 6. UTILITIES & ANIMATIONS --- */
 .custom-scrollbar::-webkit-scrollbar {
     width: 5px;
 }

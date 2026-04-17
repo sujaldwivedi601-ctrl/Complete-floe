@@ -8,7 +8,7 @@ $sql = "CREATE TABLE IF NOT EXISTS timetables (
     type ENUM('personal', 'institution') NOT NULL,
     timetable_data LONGTEXT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    FOREIGN KEY (user_id) REFERENCES user_accounts(id) ON DELETE CASCADE
 )";
 
 if (mysqli_query($conn, $sql)) {

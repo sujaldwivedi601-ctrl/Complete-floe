@@ -14,7 +14,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $institution = $_POST['institution'] ?? '';
 
     // Prepared statement use karein secure registration ke liye
-    $stmt = mysqli_prepare($conn, "INSERT INTO users (user_name, email, password, number, role, institution) VALUES (?, ?, ?, ?, ?, ?)");
+    $stmt = mysqli_prepare($conn, "INSERT INTO user_accounts (user_name, email, password, number, role, institution) VALUES (?, ?, ?, ?, ?, ?)");
     
     if ($stmt) {
         mysqli_stmt_bind_param($stmt, "ssssss", $user_name, $email, $password, $number, $role, $institution);

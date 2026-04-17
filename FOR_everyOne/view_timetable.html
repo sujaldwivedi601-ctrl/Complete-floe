@@ -4,55 +4,296 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>View Timetable - Precision Architect</title>
-    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0">
     <style>
-        body { font-family: 'Inter', sans-serif; }
+        /* ===== GLOBAL RESET & BASE ===== */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f1f5f9;
+            color: #1e293b;
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ===== HEADER ===== */
+        .site-header {
+            height: 64px;
+            background: #fff;
+            border-bottom: 1px solid #e2e8f0;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            display: flex;
+            align-items: center;
+            padding: 0 24px;
+            justify-content: space-between;
+        }
+
+        .header-left { display: flex; align-items: center; gap: 12px; }
+        .back-btn {
+            width: 36px; height: 36px;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 10px;
+            text-decoration: none;
+            color: #64748b;
+            transition: background 0.15s;
+        }
+        .back-btn:hover { background: #f1f5f9; }
+        .page-title { font-size: 18px; font-weight: 700; color: #0f172a; }
+
+        .export-btn {
+            display: flex; align-items: center; gap: 8px;
+            background: #006ADC;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.15s, transform 0.1s;
+            font-family: 'Inter', sans-serif;
+        }
+        .export-btn:hover { background: #0055b0; }
+        .export-btn:active { transform: scale(0.97); }
+        .export-btn:disabled { background: #94a3b8; cursor: not-allowed; }
+
+        /* ===== MAIN ===== */
+        .site-main { padding: 24px; width: 100%; }
+
+        .capture-area {
+            background: #fff;
+            border-radius: 24px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+            padding: 32px;
+            width: 100%;
+        }
+
+        /* ===== TIMETABLE HEADER ===== */
+        .timetable-header { text-align: center; margin-bottom: 40px; }
+        .timetable-title { font-size: 28px; font-weight: 900; color: #0f172a; margin-bottom: 8px; }
+        .timetable-meta { display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap; }
+        .meta-tag {
+            font-size: 11px; font-weight: 700;
+            background: #eff6ff; color: #006ADC;
+            border: 1px solid #bfdbfe;
+            padding: 4px 12px; border-radius: 999px;
+            text-transform: uppercase; letter-spacing: 0.08em;
+        }
+        .meta-date { font-size: 11px; color: #94a3b8; font-style: italic; }
+
+        /* ===== SEMESTER SECTION ===== */
+        .semester-section { margin-bottom: 48px; }
+        .semester-section:last-child { margin-bottom: 0; }
+
+        .sem-heading { font-size: 18px; font-weight: 800; color: #0f172a; margin-bottom: 4px; }
+        .sem-subheading {
+            font-size: 9px; font-weight: 700;
+            color: #cbd5e1; letter-spacing: 0.3em; text-transform: uppercase;
+            margin-bottom: 16px;
+        }
+
+        /* ===== TABLE ===== */
+        .table-scroll { overflow-x: auto; border-radius: 16px; border: 1px solid #e2e8f0; }
+        .tt-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 900px;
+            table-layout: auto;
+        }
+
+        .tt-table thead {
+            background: #f8fafc;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        .tt-table th {
+            padding: 14px 10px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: #94a3b8;
+            white-space: nowrap;
+        }
+        .tt-table th:first-child { width: 100px; }
+
+        .tt-table tbody tr { border-bottom: 1px solid #f1f5f9; }
+        .tt-table tbody tr:last-child { border-bottom: none; }
+        .tt-table tbody tr:hover { background: #fafafa; }
+
+        .tt-table td {
+            padding: 8px 6px;
+            vertical-align: middle;
+            text-align: center;
+            border-left: 1px solid #f1f5f9;
+        }
+        .tt-table td:first-child {
+            font-size: 10px;
+            font-weight: 800;
+            color: #0f172a;
+            background: #fff;
+            border-left: none;
+            border-right: 1px solid #f1f5f9;
+            white-space: nowrap;
+            padding: 8px 12px;
+        }
+
+        /* ===== SLOT TYPES ===== */
+        .empty-cell { color: #cbd5e1; font-size: 18px; }
+
+        .theory-slot, .practical-slot, .lunch-cell {
+            border-radius: 10px;
+            padding: 8px 6px !important;
+            display: block;
+        }
+
+        .theory-slot {
+            background: #f0f9ff;
+            border: 1px solid #bae6fd;
+        }
+        .practical-slot {
+            background: #faf5ff;
+            border: 1px solid #e9d5ff;
+        }
+        .lunch-cell {
+            background: #fffbeb;
+            border: 1px solid #fde68a;
+            font-style: italic;
+            font-size: 10px;
+            font-weight: 700;
+            color: #92400e;
+            letter-spacing: 1px;
+        }
+
+        .slot-inner {
+            word-break: break-word;
+            overflow-wrap: break-word;
+            hyphens: auto;
+        }
+        .slot-subject {
+            font-size: 10px;
+            font-weight: 800;
+            line-height: 1.3;
+            margin-bottom: 3px;
+        }
+        .theory-slot .slot-subject { color: #0369a1; }
+        .practical-slot .slot-subject { color: #6b21a8; }
+
+        .slot-label {
+            font-size: 9px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            opacity: 0.75;
+        }
+        .theory-slot .slot-label { color: #0ea5e9; }
+        .practical-slot .slot-label { color: #a855f7; }
+
+        /* ===== FOOTER ===== */
+        .page-footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #f1f5f9;
+            text-align: center;
+            font-size: 10px;
+            color: #cbd5e1;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+        }
+
+        /* ===== LOADING SPINNER ===== */
+        .spinner-wrap { display: flex; justify-content: center; padding: 80px 0; }
+        .spinner {
+            width: 40px; height: 40px;
+            border: 4px solid #e2e8f0;
+            border-top-color: #006ADC;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ===== PRINT / PDF STYLES ===== */
         @media print {
-            .no-print { display: none; }
+            body { background: white !important; }
+            .site-header { display: none !important; }
+            .site-main { padding: 0 !important; }
+            .capture-area {
+                border: none !important;
+                box-shadow: none !important;
+                border-radius: 0 !important;
+                padding: 16px !important;
+            }
+            .semester-section {
+                page-break-after: always;
+            }
+            .semester-section:last-child {
+                page-break-after: avoid;
+            }
+            .table-scroll {
+                overflow: visible !important;
+            }
+            .tt-table {
+                min-width: unset !important;
+                width: 100% !important;
+            }
+            .theory-slot {
+                background: #f0f9ff !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            .practical-slot {
+                background: #faf5ff !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            .lunch-cell {
+                background: #fffbeb !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
         }
     </style>
 </head>
-<body class="bg-[#f8fafc] text-[#1e293b] min-h-screen pb-20">
+<body>
 
-    <header class="h-16 bg-white border-b border-slate-200 sticky top-0 z-50 no-print">
-        <div class="max-w-7xl mx-auto px-6 h-full flex justify-between items-center">
-            <div class="flex items-center gap-4">
-                <a href="index.html" class="p-2 hover:bg-slate-100 rounded-xl transition-colors">
-                    <span class="material-symbols-outlined">arrow_back</span>
-                </a>
-                <h1 id="pageTitle" class="text-xl font-bold text-slate-800">Viewing Timetable</h1>
-            </div>
-            <div class="flex gap-3">
-                <button onclick="exportPDF()" class="bg-[#006ADC] hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl font-bold shadow-sm flex items-center gap-2 transition-all active:scale-95">
-                    <span class="material-symbols-outlined">download</span>
-                    Export to PDF
-                </button>
-            </div>
+    <header class="site-header">
+        <div class="header-left">
+            <a href="index.html" class="back-btn">
+                <span class="material-symbols-outlined">arrow_back</span>
+            </a>
+            <h1 id="pageTitle" class="page-title">Viewing Timetable</h1>
         </div>
+        <button id="exportBtn" onclick="exportPDF()" class="export-btn">
+            <span class="material-symbols-outlined" style="font-size:18px">download</span>
+            Export to PDF
+        </button>
     </header>
 
-    <main class="max-w-6xl mx-auto p-6 md:p-10">
-        <div id="captureArea" class="bg-white p-8 md:p-12 rounded-[2rem] shadow-xl border border-slate-100">
-            <div class="text-center mb-10">
-                <h2 id="timetableTitle" class="text-3xl font-black text-slate-900 mb-2">Loading Timetable...</h2>
-                <div class="flex items-center justify-center gap-4">
-                    <span id="timetableType" class="text-xs font-bold text-[#006ADC] uppercase tracking-widest bg-blue-50 px-3 py-1 rounded-full border border-blue-100">...</span>
-                    <span id="timetableDate" class="text-xs text-slate-400 font-medium tracking-wide italic">...</span>
+    <main class="site-main">
+        <div id="captureArea" class="capture-area">
+
+            <div class="timetable-header">
+                <h2 id="timetableTitle" class="timetable-title">Loading Timetable...</h2>
+                <div class="timetable-meta">
+                    <span id="timetableType" class="meta-tag">...</span>
+                    <span id="timetableDate" class="meta-date">...</span>
                 </div>
             </div>
 
-            <div id="timetableContent" class="space-y-12">
-                <!-- Timetables will be rendered here -->
-                <div class="flex justify-center py-20">
-                    <div class="animate-spin rounded-full h-10 w-10 border-4 border-[#006ADC] border-t-transparent"></div>
+            <div id="timetableContent">
+                <div class="spinner-wrap">
+                    <div class="spinner"></div>
                 </div>
             </div>
-            
-            <div class="mt-12 pt-8 border-t border-slate-100 text-center text-[10px] text-slate-300 font-medium uppercase tracking-[0.2em]">
-                Generated by Precision Architect • Intelligent Scheduling System
+
+            <div class="page-footer">
+                Generated by Precision Architect &bull; Intelligent Scheduling System
             </div>
         </div>
     </main>
@@ -74,13 +315,13 @@
                     if (data.success) {
                         displayTimetable(data.timetable);
                     } else {
-                        alert(data.error);
+                        alert(data.error || "Could not load timetable.");
                         window.location.href = 'index.html';
                     }
                 })
                 .catch(err => {
                     console.error(err);
-                    alert("Error loading data.");
+                    alert("Error loading timetable data.");
                 });
         });
 
@@ -89,76 +330,107 @@
             const { schedules, activeSems, days, timeSlots } = timetable_data;
 
             document.title = `${title} - Precision Architect`;
+            document.getElementById('pageTitle').textContent = title;
             document.getElementById('timetableTitle').textContent = title;
-            document.getElementById('timetableType').textContent = type;
-            document.getElementById('timetableDate').textContent = new Date(created_at).toLocaleDateString('en-US', { 
-                weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' 
+            document.getElementById('timetableType').textContent = type || 'Institution';
+            document.getElementById('timetableDate').textContent = new Date(created_at).toLocaleDateString('en-US', {
+                weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
             });
 
             const container = document.getElementById('timetableContent');
-            container.innerHTML = "";
+            container.innerHTML = '';
 
-            activeSems.sort().forEach(sem => {
+            const sortedSems = [...activeSems].sort();
+
+            sortedSems.forEach((sem, index) => {
                 const semDiv = document.createElement('div');
-                semDiv.className = "semester-section";
-                
-                let html = `
-                    <div class="flex items-center gap-4 mb-6">
-                        <div class="h-px bg-slate-100 flex-1"></div>
-                        <h3 class="text-lg font-extrabold text-slate-800 bg-slate-50 px-6 py-2 rounded-2xl border border-slate-100 uppercase tracking-widest text-sm">Semester ${sem}</h3>
-                        <div class="h-px bg-slate-100 flex-1"></div>
-                    </div>
-                    <div class="overflow-hidden rounded-2xl border border-slate-100 shadow-sm">
-                        <table class="w-full text-center border-collapse bg-white">
-                            <thead class="bg-slate-900 text-white">
-                                <tr class="text-[10px] font-bold uppercase tracking-[0.1em]">
-                                    <th class="p-5 border-slate-800">Day</th>
-                                    ${timeSlots.map(time => `<th class="p-5 border-l border-slate-800">${time}</th>`).join('')}
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-slate-50">`;
+                semDiv.className = 'semester-section';
 
+                // Build time-slot headers
+                const thHeaders = timeSlots.map(t =>
+                    `<th>${t}</th>`
+                ).join('');
+
+                // Build rows
+                let rows = '';
                 days.forEach((day, dIndex) => {
-                    html += `<tr class="hover:bg-slate-50/50 transition-colors">
-                        <td class="p-5 font-bold text-slate-700 bg-slate-50/30 border-r border-slate-50 text-sm">${day}</td>`;
-                    
-                    schedules[sem][dIndex].forEach((val, pIndex) => {
-                        const isLunch = val === "LUNCH";
-                        const cellClass = isLunch ? "bg-amber-50/50 text-amber-700 font-bold italic" : "text-slate-600 font-medium";
-                        html += `<td class="p-5 text-[11px] border-l border-slate-50 ${cellClass}">${val || "-"}</td>`;
-                    });
-                    html += `</tr>`;
+                    let cells = '';
+                    (schedules[sem][dIndex] || []).forEach(val => {
+                            if (val === 'LUNCH') {
+                                cells += `<td><span class="lunch-cell">LUNCH</span></td>`;
+                            } else if (val && typeof val === 'string') {
+                                // String format: "Subject<br><small>(T-Teacher)</small>"
+                                const isPractical = val.includes('(P-');
+                                const cls = isPractical ? 'practical-slot' : 'theory-slot';
+                                cells += `<td><div class="${cls}" style="font-size:10px;word-break:break-word;overflow-wrap:break-word;">${val}</div></td>`;
+                            } else if (val && typeof val === 'object') {
+                                // Legacy object format: {subject, teacher, type}
+                                const cls = val.type === 'P' ? 'practical-slot' : 'theory-slot';
+                                cells += `
+                                    <td>
+                                        <div class="${cls}">
+                                            <div class="slot-inner">
+                                                <div class="slot-subject">${val.subject}</div>
+                                                <div class="slot-label">${val.type}-${val.teacher}</div>
+                                            </div>
+                                        </div>
+                                    </td>`;
+                            } else {
+                                cells += `<td><span class="empty-cell">—</span></td>`;
+                            }
+                        });
+
+                    rows += `
+                        <tr>
+                            <td>${day.toUpperCase()}</td>
+                            ${cells}
+                        </tr>`;
                 });
 
-                html += `</tbody></table></div>`;
-                semDiv.innerHTML = html;
+                semDiv.innerHTML = `
+                    <div>
+                        <h3 class="sem-heading">Semester ${sem} Timetable</h3>
+                        <p class="sem-subheading">Generated</p>
+                    </div>
+                    <div class="table-scroll">
+                        <table class="tt-table">
+                            <thead>
+                                <tr>
+                                    <th>Day</th>
+                                    ${thHeaders}
+                                </tr>
+                            </thead>
+                            <tbody>${rows}</tbody>
+                        </table>
+                    </div>
+                `;
                 container.appendChild(semDiv);
             });
         }
 
         function exportPDF() {
-            const element = document.getElementById('captureArea');
+            const btn = document.getElementById('exportBtn');
             const title = document.getElementById('timetableTitle').textContent;
-            
-            const opt = {
-                margin:       0.5,
-                filename:     `${title.replace(/\s+/g, '_')}_Timetable.pdf`,
-                image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, useCORS: true, letterRendering: true },
-                jsPDF:        { unit: 'in', format: 'a4', orientation: 'landscape' }
-            };
 
-            // Start generation
-            const btn = event.currentTarget;
-            const originalHTML = btn.innerHTML;
-            btn.innerHTML = '<span class="material-symbols-outlined animate-spin">sync</span> Generating...';
+            // Set the document title so the browser uses it as the PDF filename
+            const originalTitle = document.title;
+            document.title = title.replace(/\s+/g, '_') + '_Timetable';
+
+            btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px">sync</span> Preparing PDF...';
             btn.disabled = true;
 
-            html2pdf().set(opt).from(element).save().then(() => {
-                btn.innerHTML = originalHTML;
-                btn.disabled = false;
-            });
+            // Small delay to let button update render before print dialog
+            setTimeout(() => {
+                window.print();
+                // Restore after print dialog closes
+                setTimeout(() => {
+                    document.title = originalTitle;
+                    btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px">download</span> Export to PDF';
+                    btn.disabled = false;
+                }, 500);
+            }, 150);
         }
     </script>
+
 </body>
 </html>

@@ -3,28 +3,22 @@ let teacherList = [];
 let classSubjects = {}; 
 let assignments = [];
 let teacherOccupancy = {}; 
+const totalPeriods = 7;
 const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-const timeSlots = ["10:30-11:30", "11:30-12:30", "12:30-1:30", "LUNCH", "2:30-3:30", "3:30-4:30", "4:30-5:30"];
+const timeSlots = ["10:30-11:30", "11:30-12:30", "12:30-1:30", "1:30-2:30", "2:30-3:00", "3:00-4:00", "4:00-5:00"];
 
-// --- 2. SEMESTER CARD LOGIC (NEW) ---
+// --- 2. SEMESTER CARD LOGIC ---
 document.querySelectorAll(".sem-row").forEach(card => {
     const fileInput = card.querySelector(".pdf-file-input");
     const fileNameDiv = card.querySelector(".file-name");
 
-    // Open file picker on card click
-    card.addEventListener("click", () => {
-        fileInput.click();
-    });
+    card.addEventListener("click", () => { fileInput.click(); });
 
-    // When file is selected
     fileInput.addEventListener("change", function () {
         if (this.files.length > 0) {
-            // Activate the card UI
             card.classList.add("active");
-            // Show file name
             fileNameDiv.textContent = this.files[0].name;
         } else {
-            // Reset if canceled
             card.classList.remove("active");
             fileNameDiv.textContent = "No file selected";
         }
@@ -63,7 +57,6 @@ function deleteTeacher(index) {
 
 // --- 4. DATA EXTRACTION ---
 async function uploadPDF() {
-    // Look for cards that have the 'active' class (meaning a file was selected)
     const activeCards = document.querySelectorAll(".sem-row.active");
     const container = document.getElementById("tablesContainer");
     const loader = document.getElementById("loader");
@@ -71,10 +64,11 @@ async function uploadPDF() {
     if (activeCards.length === 0) return alert("Please select a PDF file for at least one semester.");
 
     container.innerHTML = "";
+    classSubjects = {}; // Reset subject data on new extract
     loader.style.display = "flex"; 
 
     for (const card of activeCards) {
-        const semValue = card.dataset.semester; // Assuming data-semester="1" etc.
+        const semValue = card.dataset.semester;
         const fileInput = card.querySelector(".pdf-file-input");
 
         const formData = new FormData();
@@ -87,6 +81,7 @@ async function uploadPDF() {
             renderSubjectTable(semValue, data);
         } catch (error) {
             console.error("Extraction error:", error);
+            alert(`Failed to extract data for Semester ${semValue}. Is the Python server running?`);
         }
     }
     loader.style.display = "none";
@@ -96,6 +91,16 @@ function renderSubjectTable(sem, data) {
     const container = document.getElementById("tablesContainer");
     const tableDiv = document.createElement("div");
     tableDiv.className = "mb-8 p-4 border border-slate-100 rounded-2xl bg-slate-50/50";
+
+    // Store subject data in global classSubjects for the generation engine
+    if (!classSubjects[sem]) classSubjects[sem] = [];
+    data.forEach(sub => {
+        classSubjects[sem].push({
+            name: sub.subject,
+            theoryLeft: parseInt(sub.theory) || 0,
+            practicalLeft: parseInt(sub.practical) || 0
+        });
+    });
     
     tableDiv.innerHTML = `
         <h3 class="font-bold text-[#006ADC] mb-3">Semester ${sem} Assignments</h3>
@@ -115,7 +120,8 @@ function renderSubjectTable(sem, data) {
                         <td class="p-3 text-center text-sm">${sub.theory}</td>
                         <td class="p-3 text-center text-sm">${sub.practical}</td>
                         <td class="p-3">
-                            <select class="tech-dropdown w-full border-slate-200 rounded-lg text-xs p-1" data-sem="${sem}" data-sub="${sub.subject}">
+                            <select class="dynamic-teacher-input w-full border-slate-200 rounded-lg text-xs p-1"
+                                    data-sem="${sem}" data-subject="${sub.subject}">
                                 <option value="">-- Select --</option>
                                 ${teacherList.map(t => `<option value="${t}">${t}</option>`).join("")}
                             </select>
@@ -129,91 +135,136 @@ function renderSubjectTable(sem, data) {
 }
 
 // --- 5. GENERATION ENGINE ---
-document.getElementById("gen").addEventListener("click", function() {
-    const dropdowns = document.querySelectorAll(".tech-dropdown");
-    if (dropdowns.length === 0) return alert("Please extract subjects first!");
-
+document.getElementById("generateBtn").onclick = () => {
+    const dropdowns = document.querySelectorAll(".dynamic-teacher-input");
     assignments = [];
-    classSubjects = {};
-    let activeSemsSet = new Set();
+    let activeSemesters = new Set();
 
-    dropdowns.forEach(select => {
-        const sem = select.dataset.sem;
-        const subName = select.dataset.sub;
-        const teacher = select.value;
-        const row = select.closest("tr");
-
-        activeSemsSet.add(sem);
-        if (!classSubjects[sem]) classSubjects[sem] = [];
-
-        classSubjects[sem].push({
-            name: subName,
-            theoryLeft: parseInt(row.cells[1].innerText) || 0,
-            practicalLeft: parseInt(row.cells[2].innerText) || 0
-        });
-        
-        if (teacher) {
-            assignments.push({ className: sem, subject: subName, teacher: teacher });
+    dropdowns.forEach(sel => {
+        if (sel.value) {
+            activeSemesters.add(sel.dataset.sem);
+            assignments.push({
+                className: sel.dataset.sem,
+                subject: sel.dataset.subject,
+                teacher: sel.value
+            });
         }
     });
 
-    generateFinalTimetable(Array.from(activeSemsSet));
-});
+    if (dropdowns.length === 0) return alert("Please extract subjects first!");
+    if (assignments.length === 0) return alert("Please assign at least one teacher!");
 
-function generateFinalTimetable(activeSems) {
-    let schedules = {};
-    teacherOccupancy = {}; 
-    let workingData = JSON.parse(JSON.stringify(classSubjects));
+    let classSchedules = {};
+    teacherOccupancy = {};
+    let workingSubjects = JSON.parse(JSON.stringify(classSubjects));
 
-    activeSems.forEach(sem => {
-        schedules[sem] = Array.from({ length: 6 }, () => Array(7).fill(null));
-        for (let d = 0; d < 6; d++) schedules[sem][d][3] = "LUNCH"; 
+    activeSemesters.forEach(c => {
+        classSchedules[c] = Array.from({ length: 6 }, () => Array(totalPeriods).fill(null));
+        for (let d = 0; d < 6; d++) classSchedules[c][d][4] = "LUNCH";
     });
 
-    // Simple placement logic
     for (let d = 0; d < 6; d++) {
-        for (let p = 0; p < 7; p++) {
-            if (p === 3) continue;
-            activeSems.forEach(sem => {
-                let assigned = tryPlace(sem, d, p, workingData, schedules, "T");
-                if (!assigned) tryPlace(sem, d, p, workingData, schedules, "P");
+        for (let p = 0; p < totalPeriods; p++) {
+            if (p === 4) continue;
+
+            let shuffledClasses = Array.from(activeSemesters).sort(() => Math.random() - 0.5);
+
+            shuffledClasses.forEach(className => {
+                if (classSchedules[className][d][p] !== null) return;
+
+                let assigned = false;
+                let usedTheoryToday = new Set();
+
+                classSchedules[className][d].forEach(entry => {
+                    if (entry && typeof entry === 'string' && entry.includes("(T-"))
+                        usedTheoryToday.add(entry.split("<br>")[0]);
+                });
+
+                // Priority 1: Theory in the morning (periods 0-3)
+                if (p < 4) {
+                    assigned = tryAssign(className, d, p, workingSubjects, classSchedules, "T", usedTheoryToday);
+                }
+
+                // Priority 2: Practical (double block if possible, fallback single)
+                if (!assigned) {
+                    assigned = tryAssign(className, d, p, workingSubjects, classSchedules, "P");
+                }
+
+                // Priority 3: Fallback — remaining theory hours
+                if (!assigned) {
+                    assigned = tryAssign(className, d, p, workingSubjects, classSchedules, "T", new Set());
+                }
             });
         }
     }
-    renderOutput(schedules, activeSems);
-}
+    display(classSchedules, Array.from(activeSemesters));
+};
 
-function tryPlace(sem, day, period, data, schedules, type) {
-    let pool = assignments.filter(a => {
-        if (a.className !== sem) return false;
-        let sub = data[sem].find(s => s.name === a.subject);
-        return type === "P" ? sub.practicalLeft > 0 : sub.theoryLeft > 0;
-    }).sort(() => Math.random() - 0.5);
+// --- 6. HELPER: TRY ASSIGN ---
+function tryAssign(className, dayIdx, periodIdx, data, schedules, type, usedTheoryToday = new Set()) {
+    let candidates = assignments.filter(a => {
+        if (a.className !== className) return false;
+        let subData = data[className]?.find(s => s.name === a.subject);
+        if (!subData) return false;
+        return type === "T"
+            ? (subData.theoryLeft > 0 && !usedTheoryToday.has(a.subject))
+            : subData.practicalLeft > 0;
+    });
 
-    for (let c of pool) {
-        let key = `${day}-${period}-${c.teacher}`;
-        let sub = data[sem].find(s => s.name === c.subject);
+    candidates.sort(() => Math.random() - 0.5);
 
-        if (!teacherOccupancy[key] && !schedules[sem][day][period]) {
-            schedules[sem][day][period] = `<b>${c.subject}</b><br><small>${c.teacher}</small>`;
-            teacherOccupancy[key] = true;
-            if (type === "P") sub.practicalLeft--; else sub.theoryLeft--;
-            return true;
+    for (let candidate of candidates) {
+        let teacherKey1 = `${dayIdx}-${periodIdx}-${candidate.teacher}`;
+        let subData = data[className].find(s => s.name === candidate.subject);
+
+        if (type === "P") {
+            let nextP = periodIdx + 1;
+            let teacherKey2 = `${dayIdx}-${nextP}-${candidate.teacher}`;
+
+            // Try double-block practical
+            if (nextP < totalPeriods && nextP !== 4 &&
+                schedules[className][dayIdx][nextP] === null &&
+                !teacherOccupancy[teacherKey1] && !teacherOccupancy[teacherKey2] &&
+                subData.practicalLeft >= 2) {
+
+                const label = `${candidate.subject}<br><small>(P-${candidate.teacher})</small>`;
+                schedules[className][dayIdx][periodIdx] = label;
+                schedules[className][dayIdx][nextP] = label;
+                teacherOccupancy[teacherKey1] = true;
+                teacherOccupancy[teacherKey2] = true;
+                subData.practicalLeft -= 2;
+                return true;
+            }
+
+            // Single practical block fallback
+            if (!teacherOccupancy[teacherKey1] && subData.practicalLeft > 0) {
+                schedules[className][dayIdx][periodIdx] = `${candidate.subject}<br><small>(P-${candidate.teacher})</small>`;
+                teacherOccupancy[teacherKey1] = true;
+                subData.practicalLeft--;
+                return true;
+            }
+        } else {
+            if (!teacherOccupancy[teacherKey1]) {
+                schedules[className][dayIdx][periodIdx] = `${candidate.subject}<br><small>(T-${candidate.teacher})</small>`;
+                teacherOccupancy[teacherKey1] = true;
+                subData.theoryLeft--;
+                return true;
+            }
         }
     }
     return false;
 }
 
-// --- 6. SEPARATE DIV OUTPUT DISPLAY ---
-function renderOutput(schedules, activeSems) {
+// --- 7. DISPLAY GENERATED TIMETABLE ---
+function display(schedules, activeSems) {
     const cont = document.getElementById("timetableContainer");
-    cont.innerHTML = ""; // Clear bottom area
+    cont.innerHTML = "";
 
-    // Add a global Save Button at the top
+    // Save button
     const saveBtnContainer = document.createElement("div");
     saveBtnContainer.className = "flex justify-end mb-6";
     saveBtnContainer.innerHTML = `
-        <button onclick='prepareSave(${JSON.stringify(schedules)}, ${JSON.stringify(activeSems)})' 
+        <button onclick='prepareSave(${JSON.stringify(schedules)}, ${JSON.stringify(activeSems)})'
                 class="bg-[#006ADC] hover:bg-blue-700 text-white px-6 py-3 rounded-2xl font-bold shadow-lg flex items-center gap-2 transform transition-all active:scale-95">
             <span class="material-symbols-outlined">save</span>
             Save All Timetables
@@ -221,57 +272,58 @@ function renderOutput(schedules, activeSems) {
     `;
     cont.appendChild(saveBtnContainer);
 
-    activeSems.sort().forEach(sem => {
-        // Create a separate div (card) for each semester
+    [...activeSems].sort().forEach(sem => {
         const semCard = document.createElement("div");
-        semCard.className = "bg-white p-6 rounded-3xl shadow-xl border border-slate-100 mb-8 transition-all hover:shadow-2xl";
-        
+        semCard.className = "bg-white p-8 rounded-[2rem] shadow-xl border border-slate-100 mb-10 transition-all hover:shadow-2xl overflow-x-auto";
+
         let html = `
-            <div class="flex justify-between items-center mb-6">
-                <h3 class="text-xl font-extrabold text-slate-800">Semester ${sem} Timetable</h3>
-                <div class="flex gap-2">
-                    <span class="px-3 py-1 bg-blue-50 text-[#006ADC] rounded-full text-[10px] font-bold border border-blue-100 uppercase">Generated</span>
-                </div>
+            <div class="mb-8">
+                <h3 class="text-xl font-bold text-slate-800">Semester ${sem} Timetable</h3>
+                <p class="text-[10px] font-bold text-slate-300 tracking-[0.3em] uppercase mt-2">GENERATED</p>
             </div>
-            <div class="overflow-x-auto rounded-xl">
-                <table class="w-full text-center border-collapse">
-                    <thead class="bg-slate-50">
-                        <tr class="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                            <th class="p-4 border-b">Day</th>
-                            ${timeSlots.map(time => `<th class="p-4 border-b border-l">${time}</th>`).join('')}
-                        </tr>
-                    </thead>
-                    <tbody>`;
+            <table class="w-full text-center border-collapse min-w-[900px]">
+                <thead class="bg-[#f8fafc] text-slate-500 border-b border-slate-100">
+                    <tr class="text-[10px] font-bold uppercase tracking-[0.15em] text-slate-400">
+                        <th class="p-4 w-28 font-bold">DAY</th>
+                        ${timeSlots.map(time => `<th class="p-4 border-l border-slate-100 font-bold">${time}</th>`).join('')}
+                    </tr>
+                </thead>
+                <tbody>`;
 
         days.forEach((day, dIndex) => {
-            html += `<tr>
-                <td class="p-4 font-bold text-slate-700 bg-slate-50/30 border-r text-sm">${day}</td>`;
-            
-            schedules[sem][dIndex].forEach((val, pIndex) => {
-                const isLunch = val === "LUNCH";
-                const cellClass = isLunch ? "bg-amber-50 text-amber-600 font-bold italic" : "text-slate-600";
-                html += `<td class="p-4 text-[11px] border-l border-slate-50 ${cellClass}">${val || "-"}</td>`;
+            html += `<tr class="hover:bg-slate-50/50 transition-colors border-b border-slate-50">
+                <td class="p-4 font-bold text-slate-900 bg-white border-r border-slate-100 text-xs whitespace-nowrap">${day.toUpperCase()}</td>`;
+
+            schedules[sem][dIndex].forEach(val => {
+                if (val === "LUNCH") {
+                    html += `<td class="p-3 border-l border-slate-50"><span class="lunch-cell">LUNCH</span></td>`;
+                } else if (val && typeof val === 'string') {
+                    const isPractical = val.includes("(P-");
+                    const slotClass = isPractical ? "practical-slot" : "theory-slot";
+                    html += `<td class="p-2 border-l border-slate-50"><div class="${slotClass}" style="font-size:10px;word-break:break-word;overflow-wrap:break-word;">${val}</div></td>`;
+                } else {
+                    html += `<td class="p-4 border-l border-slate-50 text-slate-300 text-lg">—</td>`;
+                }
             });
             html += `</tr>`;
         });
 
-        html += `</tbody></table></div>`;
+        html += `</tbody></table>`;
         semCard.innerHTML = html;
         cont.appendChild(semCard);
     });
 
-    // Scroll to results
     cont.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
-// --- 7. SAVE FUNCTIONALITY ---
+// --- 8. SAVE FUNCTIONALITY ---
 window.prepareSave = function(schedules, activeSems) {
     const title = prompt("Enter a title for this timetable (e.g., 'Even Semester 2024'):");
     if (!title) return;
 
     const dataToSave = {
         title: title,
-        type: 'institution', // or user could choose
+        type: 'institution',
         timetable_data: {
             schedules: schedules,
             activeSems: activeSems,
@@ -297,4 +349,4 @@ window.prepareSave = function(schedules, activeSems) {
         console.error(err);
         alert("Failed to save timetable.");
     });
-};
+};
