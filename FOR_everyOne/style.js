@@ -1,45 +1,51 @@
 // --- 1. GLOBAL STATE ---
 let teacherList = [];
-let classSubjects = {}; 
+let classSubjects = {};
 let assignments = [];
-let teacherOccupancy = {}; 
+let teacherOccupancy = {};
 const totalPeriods = 7;
 const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 const timeSlots = ["10:30-11:30", "11:30-12:30", "12:30-1:30", "1:30-2:30", "2:30-3:00", "3:00-4:00", "4:00-5:00"];
 
 // --- 2. SEMESTER CARD LOGIC ---
-document.querySelectorAll(".sem-row").forEach(card => {
-    const fileInput = card.querySelector(".pdf-file-input");
-    const fileNameDiv = card.querySelector(".file-name");
+document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll(".sem-row").forEach(card => {
+        const fileInput = card.querySelector(".pdf-file-input");
+        const fileNameDiv = card.querySelector(".file-name");
 
-    card.addEventListener("click", () => { fileInput.click(); });
+        card.addEventListener("click", () => { fileInput.click(); });
 
-    fileInput.addEventListener("change", function () {
-        if (this.files.length > 0) {
-            card.classList.add("active");
-            fileNameDiv.textContent = this.files[0].name;
-        } else {
-            card.classList.remove("active");
-            fileNameDiv.textContent = "No file selected";
-        }
+        fileInput.addEventListener("change", function () {
+            if (this.files.length > 0) {
+                card.classList.add("active");
+                fileNameDiv.textContent = this.files[0].name;
+            } else {
+                card.classList.remove("active");
+                fileNameDiv.textContent = "No file selected";
+            }
+        });
     });
-});
 
-// --- 3. TEACHER MANAGEMENT ---
-document.getElementById("addTeacherBtn").addEventListener("click", () => {
-    const input = document.getElementById("teacherInput");
-    const name = input.value.trim();
+    // --- 3. TEACHER MANAGEMENT ---
+    const addTeacherBtn = document.getElementById("addTeacherBtn");
+    if (addTeacherBtn) {
+        addTeacherBtn.addEventListener("click", () => {
+            const input = document.getElementById("teacherInput");
+            const name = input.value.trim();
 
-    if (!name) return alert("Enter teacher name");
-    if (teacherList.includes(name)) return alert("Teacher already added");
+            if (!name) return alert("Enter teacher name");
+            if (teacherList.includes(name)) return alert("Teacher already added");
 
-    teacherList.push(name);
-    input.value = "";
-    renderTeacherList();
+            teacherList.push(name);
+            input.value = "";
+            renderTeacherList();
+        });
+    }
 });
 
 function renderTeacherList() {
     const container = document.getElementById("teacherListUI");
+    if (!container) return;
     container.innerHTML = teacherList.map((t, i) => `
         <div class="flex justify-between items-center bg-slate-50 p-3 rounded-xl border border-slate-100">
             <span class="font-semibold text-slate-700">${t}</span>
@@ -135,17 +141,20 @@ function renderSubjectTable(sem, data) {
 }
 
 // --- 5. GENERATION ENGINE ---
-document.getElementById("generateBtn").onclick = () => {
-    const dropdowns = document.querySelectorAll(".dynamic-teacher-input");
-    assignments = [];
-    let activeSemesters = new Set();
+document.addEventListener("DOMContentLoaded", () => {
+    const generateBtn = document.getElementById("generateBtn");
+    if (generateBtn) {
+        generateBtn.onclick = () => {
+            const dropdowns = document.querySelectorAll(".dynamic-teacher-input");
+            assignments = [];
+            let activeSemesters = new Set();
 
-    dropdowns.forEach(sel => {
-        if (sel.value) {
-            activeSemesters.add(sel.dataset.sem);
-            assignments.push({
-                className: sel.dataset.sem,
-                subject: sel.dataset.subject,
+            dropdowns.forEach(sel => {
+                if (sel.value) {
+                    activeSemesters.add(sel.dataset.sem);
+                    assignments.push({
+                        className: sel.dataset.sem,
+                        subject: sel.dataset.subject,
                 teacher: sel.value
             });
         }
@@ -198,7 +207,9 @@ document.getElementById("generateBtn").onclick = () => {
         }
     }
     display(classSchedules, Array.from(activeSemesters));
-};
+        };
+    }
+});
 
 // --- 6. HELPER: TRY ASSIGN ---
 function tryAssign(className, dayIdx, periodIdx, data, schedules, type, usedTheoryToday = new Set()) {
@@ -324,6 +335,7 @@ window.prepareSave = function(schedules, activeSems) {
     const dataToSave = {
         title: title,
         type: 'institution',
+        is_public: 0,
         timetable_data: {
             schedules: schedules,
             activeSems: activeSems,
@@ -341,6 +353,10 @@ window.prepareSave = function(schedules, activeSems) {
     .then(data => {
         if (data.success) {
             alert("✓ Timetable saved successfully!");
+            if (data.timetable_id) {
+                window.lastTimetableId = data.timetable_id;
+                document.getElementById('publishBtn').classList.remove('hidden');
+            }
         } else {
             alert("Error: " + data.error);
         }
@@ -350,3 +366,89 @@ window.prepareSave = function(schedules, activeSems) {
         alert("Failed to save timetable.");
     });
 };
+
+window.publishTimetable = function(timetableId) {
+    const id = timetableId || window.lastTimetableId;
+    if (!id) {
+        alert("Please save the timetable first.");
+        return;
+    }
+
+    fetch('../PHP/publish_timetable.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ timetable_id: id })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            alert("✓ Timetable published to students!");
+            document.getElementById('publishBtn').classList.add('hidden');
+        } else {
+            alert("Error: " + data.error);
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        alert("Failed to publish timetable.");
+    });
+};
+
+// --- 9. COLLEGE TIMETABLE (For Students) ---
+window.loadCollegeTimetable = async function() {
+    const container = document.getElementById('collegeTimetable');
+    if (!container) return;
+
+    try {
+        const res = await fetch('../PHP/get_college_timetable.php');
+        const data = await res.json();
+
+        if (data.success && data.timetable) {
+            renderCollegeTimetable(container, data.timetable);
+        } else {
+            container.innerHTML = '<p class="text-slate-500">No timetable published yet.</p>';
+        }
+    } catch (err) {
+        console.error(err);
+        container.innerHTML = '<p class="text-red-500">Failed to load timetable.</p>';
+    }
+};
+
+function renderCollegeTimetable(container, timetable) {
+    const td = timetable.timetable_data;
+    const schedules = td.schedules;
+    const activeSems = td.activeSems;
+    const daysList = td.days || days;
+    const timeSlotsList = td.timeSlots || timeSlots;
+
+    let html = `<h3 class="text-xl font-bold mb-4">${timetable.title}</h3>`;
+    
+    activeSems.sort().forEach(sem => {
+        html += `<div class="mb-8"><h4 class="font-bold mb-2">Semester ${sem}</h4>`;
+        html += `<div class="overflow-x-auto"><table class="w-full border-collapse text-sm">`;
+        html += `<thead><tr><th class="border p-2 bg-slate-100"></th>`;
+        
+        timeSlotsList.forEach(slot => {
+            html += `<th class="border p-2 bg-slate-100">${slot}</th>`;
+        });
+        html += `</tr></thead><tbody>`;
+
+        daysList.forEach((day, dIndex) => {
+            html += `<tr><td class="border p-2 font-bold">${day}</td>`;
+            const daySchedule = schedules[sem]?.[dIndex] || [];
+            timeSlotsList.forEach((_, tIndex) => {
+                const slot = daySchedule[tIndex];
+                if (!slot || slot === 'LUNCH') {
+                    html += `<td class="border p-2 ${slot === 'LUNCH' ? 'bg-yellow-50' : ''}">${slot === 'LUNCH' ? 'LUNCH' : '—'}</td>`;
+                } else {
+                    html += `<td class="border p-2 bg-blue-50">${slot}</td>`;
+                }
+            });
+            html += `</tr>`;
+        });
+        
+        html += `</tbody></table></div></div>`;
+    });
+
+    container.innerHTML = html;
+}

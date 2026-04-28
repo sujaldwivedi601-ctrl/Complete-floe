@@ -44,7 +44,8 @@
                 <nav class="hidden md:flex items-center gap-2">
                     <a class="font-semibold text-sm text-blue-700 bg-blue-50/80 px-5 py-2.5 rounded-xl shadow-sm border border-blue-100/50" href="index.html">Home</a>
                     <a class="font-medium text-sm text-slate-600 px-5 py-2.5 rounded-xl hover:bg-slate-100/60 hover:text-slate-900 transition-all" href="generate_timetable.html">Generate Timetable</a>
-                    <a class="font-medium text-sm text-slate-600 px-5 py-2.5 rounded-xl hover:bg-slate-100/60 hover:text-slate-900 transition-all" href="personal_Timetable.html">Personal Timetable</a>
+                    <a class="font-medium text-sm text-slate-600 px-5 py-2.5 rounded-xl hover:bg-slate-100/60 hover:text-slate-900 transition-all" href="student_dashboard.html">My Timetable</a>
+                    <a class="font-medium text-sm text-slate-600 px-5 py-2.5 rounded-xl hover:bg-slate-100/60 hover:text-slate-900 transition-all" href="about.html">About</a>
                     <button id="logoutBtn" class="ml-4 font-semibold text-sm text-slate-700 px-6 py-2.5 rounded-xl border border-slate-200/60 hover:bg-white hover:shadow-md transition-all duration-300 cursor-pointer">Logout</button>
                 </nav>
             </div>
@@ -80,6 +81,65 @@
                     </div>
                 </section>
 
+                <!-- Progress Section -->
+                <section id="progress-section" class="mt-8" style="display: none;">
+                    <div class="flex justify-between items-end mb-8">
+                        <div>
+                            <h2 class="text-3xl font-extrabold text-slate-900 tracking-tight">Your Progress</h2>
+                            <p class="text-slate-500 font-medium mt-1">Track your performance and streaks.</p>
+                        </div>
+                        <button onclick="askAIMotivation()" class="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2">
+                            <span class="material-symbols-outlined text-sm">psychology</span>
+                            Ask AI
+                        </button>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <!-- Day Streak -->
+                        <div class="glass-panel p-6 rounded-[1.5rem] flex items-center gap-6 group hover:-translate-y-1 hover:shadow-xl transition-all duration-300">
+                            <div class="w-16 h-16 rounded-[1.2rem] bg-gradient-to-br from-orange-50 to-red-50 text-orange-600 flex items-center justify-center shadow-inner border border-white group-hover:scale-110 transition-transform duration-300">
+                                <span class="material-symbols-outlined text-3xl">local_fire_department</span>
+                            </div>
+                            <div>
+                                <p class="text-slate-500 text-sm font-semibold mb-1">Day Streak</p>
+                                <h4 id="streakCount" class="text-3xl font-extrabold text-slate-900 tracking-tight">0</h4>
+                                <p class="text-xs text-orange-600 font-medium">consecutive days</p>
+                            </div>
+                        </div>
+                        <!-- Done This Week -->
+                        <div class="glass-panel p-6 rounded-[1.5rem] flex items-center gap-6 group hover:-translate-y-1 hover:shadow-xl transition-all duration-300">
+                            <div class="w-16 h-16 rounded-[1.2rem] bg-gradient-to-br from-green-50 to-emerald-50 text-green-600 flex items-center justify-center shadow-inner border border-white group-hover:scale-110 transition-transform duration-300">
+                                <span class="material-symbols-outlined text-3xl">task_alt</span>
+                            </div>
+                            <div>
+                                <p class="text-slate-500 text-sm font-semibold mb-1">Done This Week</p>
+                                <h4 id="weekDone" class="text-3xl font-extrabold text-slate-900 tracking-tight">0</h4>
+                                <p class="text-xs text-green-600 font-medium">tasks completed</p>
+                            </div>
+                        </div>
+                        <!-- Completion Rate -->
+                        <div class="glass-panel p-6 rounded-[1.5rem] flex items-center gap-6 group hover:-translate-y-1 hover:shadow-xl transition-all duration-300">
+                            <div class="w-16 h-16 rounded-[1.2rem] bg-gradient-to-br from-blue-50 to-indigo-50 text-blue-600 flex items-center justify-center shadow-inner border border-white group-hover:scale-110 transition-transform duration-300">
+                                <span class="material-symbols-outlined text-3xl">trending_up</span>
+                            </div>
+                            <div>
+                                <p class="text-slate-500 text-sm font-semibold mb-1">Completion Rate</p>
+                                <h4 id="completionRate" class="text-3xl font-extrabold text-slate-900 tracking-tight">0%</h4>
+                                <p class="text-xs text-blue-600 font-medium">of all tasks</p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- AI Motivation Card -->
+                    <div id="motivationCard" class="hidden mt-6 glass-panel p-6 rounded-[1.5rem]">
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+                                <span class="material-symbols-outlined text-white">smart_toy</span>
+                            </div>
+                            <span class="font-bold text-purple-700">AI Motivation</span>
+                        </div>
+                        <p id="motivationText" class="text-slate-700"></p>
+                    </div>
+                </section>
+
                 <!-- Stats Section -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div class="glass-panel p-6 rounded-[1.5rem] flex items-center gap-6 group hover:-translate-y-1 hover:shadow-xl transition-all duration-300 cursor-default">
@@ -92,6 +152,17 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- College Published Timetable (For Students) -->
+                <section id="collegeTimetableSection" class="mt-8" style="display: none;">
+                    <div class="mb-8">
+                        <h2 class="text-3xl font-extrabold text-slate-900 tracking-tight">College Timetable</h2>
+                        <p class="text-slate-500 font-medium mt-1">Latest published schedule for your institution.</p>
+                    </div>
+                    <div id="collegeTimetable" class="glass-panel p-8 rounded-[2rem]">
+                        <p class="text-slate-500">Loading college timetable...</p>
+                    </div>
+                </section>
 
                 <!-- Saved Timetables Section -->
                 <section class="mt-8">
@@ -139,6 +210,7 @@
         </main>
     </div>
 
+    <script src="style.js"></script>
     <script src="dashboard.js"></script>
 </body>
 </html>

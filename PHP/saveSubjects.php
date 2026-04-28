@@ -2,7 +2,7 @@
 header("Content-Type: application/json");
 
 // DB connection
-$conn = new mysqli("localhost", "root", "", "timetable_db");
+$conn = new mysqli("localhost", "root", "", "timetable_system");
 
 if ($conn->connect_error) {
     die(json_encode(["status" => "error", "message" => "DB Connection failed"]));
@@ -18,7 +18,7 @@ if (!$data) {
 
 // Insert each subject
 foreach ($data as $sub) {
-    $name = $conn->real_escape_string($sub['name']);
+    $name = $conn->real_escape_string($sub['subject']);
     $theory = (int)$sub['theory'];
     $practical = (int)$sub['practical'];
     $teacher = $conn->real_escape_string($sub['teacher']);

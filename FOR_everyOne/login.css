@@ -111,3 +111,32 @@ body {
 .footer-links a:hover {
     text-decoration: underline;
 }
+
+.role-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.role-btn {
+    flex: 1;
+    padding: 10px 16px;
+    border: 2px solid var(--border);
+    border-radius: 6px;
+    background: var(--white);
+    color: var(--text-muted);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.role-btn:hover {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+}
+
+.role-btn.active {
+    border-color: var(--primary-color);
+    background-color: var(--primary-color);
+    color: var(--white);
+}

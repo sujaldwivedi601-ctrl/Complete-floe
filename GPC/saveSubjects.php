@@ -24,8 +24,16 @@ try {
     $input = file_get_contents("php://input");
     $data = json_decode($input, true);
 
-    if (!$data) {
-        throw new Exception("Invalid data received.");
+    if (!$data || !is_array($data)) {
+        http_response_code(200);
+        echo "No data to save";
+        exit;
+    }
+
+    if (empty($data)) {
+        http_response_code(200);
+        echo "No data to save";
+        exit;
     }
 
     $pdo->beginTransaction();
@@ -62,7 +70,7 @@ try {
 
 } catch (Exception $e) {
 
-    if (isset($pdo)) $pdo->rollBack();
+    if (isset($pdo) && $pdo->inTransaction()) $pdo->rollBack();
 
     http_response_code(500);
     echo "Error: " . $e->getMessage();

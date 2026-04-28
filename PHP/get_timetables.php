@@ -11,9 +11,9 @@ if (!isset($_SESSION['id'])) {
 
 $user_id = $_SESSION['id'];
 
-$stmt = mysqli_prepare($conn, "SELECT id, title, type, created_at FROM timetables WHERE user_id = ? ORDER BY created_at DESC");
+$stmt = mysqli_prepare($conn, "SELECT id, title, type, is_public, created_at FROM timetables WHERE user_id = ? OR (college_id = (SELECT college_id FROM user_accounts WHERE id = ?) AND is_public = 1) ORDER BY created_at DESC");
 if ($stmt) {
-    mysqli_stmt_bind_param($stmt, "i", $user_id);
+    mysqli_stmt_bind_param($stmt, "ii", $user_id, $user_id);
     mysqli_stmt_execute($stmt);
     $result = mysqli_stmt_get_result($stmt);
     

@@ -1,11 +1,10 @@
 <!doctype html>
-
 <html class="light" lang="en">
 
 <head>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <title>Precision Architect - Generator Workshop</title>
+    <title>Precision Architect - Personal Timetable</title>
 
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1;display=swap"
         rel="stylesheet" />
@@ -17,67 +16,13 @@
                 extend: {
                     colors: {
                         "on-background": "#2d3335",
-                        "on-primary-container": "#000000",
-                        secondary: "#575f72",
-                        "on-primary-fixed-variant": "#000b22",
-                        "surface-bright": "#f8f9fa",
                         "surface-container": "#ebeef0",
-                        "secondary-dim": "#4b5365",
-                        "on-surface-variant": "#5a6062",
-                        "tertiary-dim": "#5c4c74",
-                        "surface-dim": "#d5dbdd",
-                        "secondary-fixed-dim": "#ccd4ea",
-                        "on-error-container": "#6e0a12",
-                        "error-container": "#fa746f",
-                        "error-dim": "#67040d",
-                        "secondary-container": "#dae2f9",
-                        "surface-container-high": "#e5e9eb",
-                        background: "#f8f9fa",
-                        "on-secondary-container": "#4a5264",
-                        "on-error": "#fff7f6",
-                        "on-tertiary-container": "#53436c",
-                        "tertiary-fixed-dim": "#d5c1f1",
-                        "secondary-fixed": "#dae2f9",
-                        "on-tertiary-fixed": "#403157",
-                        "primary-dim": "#0050a9",
-                        "on-secondary-fixed-variant": "#535b6e",
-                        "on-primary-fixed": "#000000",
-                        "on-secondary-fixed": "#373f51",
-                        tertiary: "#685781",
-                        "primary-fixed-dim": "#2376e9",
-                        "tertiary-fixed": "#e4ceff",
-                        "surface-container-low": "#f1f4f5",
-                        "surface-container-highest": "#dee3e6",
-                        "on-primary": "#f9f8ff",
-                        "inverse-on-surface": "#9b9d9e",
-                        primary: "#005cc0",
-                        "tertiary-container": "#e4ceff",
+                        "primary": "#005cc0",
                         "primary-fixed": "#3784f7",
-                        "on-tertiary-fixed-variant": "#5d4d76",
-                        surface: "#f8f9fa",
-                        "on-tertiary": "#fef7ff",
-                        error: "#a83836",
-                        "surface-variant": "#dee3e6",
-                        "on-surface": "#2d3335",
-                        "surface-tint": "#005cc0",
-                        "surface-container-lowest": "#ffffff",
-                        "inverse-primary": "#498eff",
-                        "primary-container": "#3784f7",
-                        outline: "#767c7e",
-                        "on-secondary": "#f9f8ff",
-                        "inverse-surface": "#0c0f10",
-                        "outline-variant": "#adb3b5",
                     },
                     fontFamily: {
                         headline: ["Manrope"],
                         body: ["Inter"],
-                        label: ["Inter"],
-                    },
-                    borderRadius: {
-                        DEFAULT: "0.25rem",
-                        lg: "0.5rem",
-                        xl: "0.75rem",
-                        full: "9999px",
                     },
                 },
             },
@@ -86,66 +31,405 @@
 
     <style>
         .material-symbols-outlined {
-            font-variation-settings:
-                "FILL" 0,
-                "wght" 400,
-                "GRAD" 0,
-                "opsz" 24;
+            font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
             vertical-align: middle;
         }
-
-        .glass-panel {
-            background: rgba(255, 255, 255, 0.5);
-            backdrop-filter: blur(12px);
-        }
-
-        .gradient-button {
-            background: linear-gradient(135deg, #005cc0 0%, #3784f7 100%);
-        }
-
-        /* No-Line Philosophy: Layout via tonal shifts */
-        body {
-            background-color: #dae4ee;
-            color: #2d3335;
-            -webkit-font-smoothing: antialiased;
-        }
+        body { background-color: #dae4ee; color: #2d3335; -webkit-font-smoothing: antialiased; }
+        .glass-panel { background: rgba(255, 255, 255, 0.5); backdrop-filter: blur(12px); }
     </style>
 </head>
 
 <body class="font-body min-h-screen flex flex-col">
-    <!-- TopNavBar -->
-
-    <header
-        class=" h-16 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md sticky top-0 z-10 w-full border-b border-outline-variant/10">
+    <header class="h-16 bg-white/80 backdrop-blur-md sticky top-0 z-10 w-full border-b border-slate-200">
         <div class="flex justify-between items-center w-full px-5 py-3 max-w-7xl mx-auto">
-            <div class="text-xl font-extrabold text-[#006ADC] dark:text-blue-400 tracking-tighter font-headline">
+            <div class="text-xl font-extrabold text-[#006ADC] tracking-tighter font-headline">
                 Precision Architect
             </div>
-            <nav class="hidden md:flex items-center gap-4 italic-none">
-                <a class="font-['Manrope'] font-bold text-sm tracking-wide text-[#2d3335] dark:text-slate-300 px-4 py-2 rounded-lg hover:bg-primary/5 hover:text-[#006ADC] transition-all duration-200"
+            <nav class="hidden md:flex items-center gap-4">
+                <a class="font-['Manrope'] font-bold text-sm text-slate-600 px-4 py-2 rounded-lg hover:bg-blue-50 hover:text-[#006ADC] transition-all"
                     href="index.html">Home</a>
-                <a class="font-['Manrope'] font-bold text-sm tracking-wide text-[#2d3335] dark:text-slate-300 px-4 py-2 rounded-lg hover:bg-primary/5 hover:text-[#006ADC] transition-all duration-200"
-                    href="generate_timetable.html">Generate Timetable</a>
-
-                <a class="font-['Manrope'] font-bold text-sm tracking-wide text-[#006ADC] dark:text-blue-400 bg-primary/10 px-4 py-2 rounded-lg border-b-2 border-[#006ADC]"
+                <a class="font-['Manrope'] font-bold text-sm text-[#006ADC] bg-blue-50 px-4 py-2 rounded-lg border-b-2 border-[#006ADC]"
                     href="personal_Timetable.html">Personal Timetable</a>
-
-                <button
-                    class="ml-4 font-['Manrope'] font-bold text-sm tracking-wide text-[#2d3335] dark:text-slate-300 px-5 py-2 rounded-lg border border-outline/20 hover:bg-surface-container-high hover:border-transparent transition-all duration-200">
+                <button id="logoutBtn"
+                    class="ml-4 font-['Manrope'] font-bold text-sm text-slate-600 px-5 py-2 rounded-lg border border-slate-200 hover:bg-slate-100">
                     Logout
                 </button>
             </nav>
-            <div class="md:hidden">
-                <span class="material-symbols-outlined text-on-surface">menu</span>
-            </div>
         </div>
-        <div class="flex justify-between items-center w-full px-8 py-6 max-w-7xl mx-auto"></div>
     </header>
 
+    <main class="max-w-7xl mx-auto p-6">
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            <!-- Left Sidebar: Day Selector -->
+            <div class="lg:col-span-1">
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                    <h2 class="text-lg font-bold text-[#006ADC] mb-4 flex items-center gap-2">
+                        <span class="material-symbols-outlined">calendar_month</span>
+                        Select Day
+                    </h2>
+                    <div id="daySelector" class="space-y-2">
+                        <button class="day-btn w-full text-left px-4 py-3 rounded-xl bg-blue-50 text-[#006ADC] font-semibold" data-day="Monday">
+                            Monday
+                        </button>
+                        <button class="day-btn w-full text-left px-4 py-3 rounded-xl hover:bg-slate-50 text-slate-600 transition-colors" data-day="Tuesday">
+                            Tuesday
+                        </button>
+                        <button class="day-btn w-full text-left px-4 py-3 rounded-xl hover:bg-slate-50 text-slate-600 transition-colors" data-day="Wednesday">
+                            Wednesday
+                        </button>
+                        <button class="day-btn w-full text-left px-4 py-3 rounded-xl hover:bg-slate-50 text-slate-600 transition-colors" data-day="Thursday">
+                            Thursday
+                        </button>
+                        <button class="day-btn w-full text-left px-4 py-3 rounded-xl hover:bg-slate-50 text-slate-600 transition-colors" data-day="Friday">
+                            Friday
+                        </button>
+                        <button class="day-btn w-full text-left px-4 py-3 rounded-xl hover:bg-slate-50 text-slate-600 transition-colors" data-day="Saturday">
+                            Saturday
+                        </button>
+                    </div>
+                </div>
 
+                <!-- Stats for selected day -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 mt-6">
+                    <h3 class="font-bold text-slate-700 mb-3">Today's Summary</h3>
+                    <div class="space-y-3">
+                        <div class="flex justify-between">
+                            <span class="text-sm text-slate-500">Free Time</span>
+                            <span id="freeTimeDisplay" class="font-bold text-green-600">--</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-sm text-slate-500">Classes</span>
+                            <span id="classCount" class="font-bold text-[#006ADC]">--</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-sm text-slate-500">Tasks Due</span>
+                            <span id="taskCount" class="font-bold text-orange-600">--</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-    <h1> this is your personal timetable </h1>
+            <!-- Main Content: Timetable -->
+            <div class="lg:col-span-3">
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+                            <span class="material-symbols-outlined">schedule</span>
+                            <span id="timetableTitle">Personal Timetable</span>
+                        </h2>
+                        <button onclick="savePersonalTimetable()" class="bg-[#006ADC] hover:bg-blue-700 text-white px-6 py-2 rounded-xl font-bold flex items-center gap-2">
+                            <span class="material-symbols-outlined">save</span>
+                            Save Changes
+                        </button>
+                    </div>
 
+                    <!-- Loading State -->
+                    <div id="timetableLoader" class="flex justify-center py-20">
+                        <div class="w-12 h-12 border-4 border-slate-200 border-t-[#006ADC] rounded-full animate-spin"></div>
+                    </div>
+
+                    <!-- Timetable Grid -->
+                    <div id="timetableContent" class="hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full border-collapse">
+                                <thead>
+                                    <tr>
+                                        <th class="border-b-2 border-slate-200 p-3 text-left text-sm font-bold text-slate-500 w-32">Time</th>
+                                        <th class="border-b-2 border-slate-200 p-3 text-left text-sm font-bold text-slate-500">Class / Activity</th>
+                                        <th class="border-b-2 border-slate-200 p-3 text-left text-sm font-bold text-slate-500 w-40">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="timetableBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Empty State -->
+                    <div id="emptyState" class="hidden text-center py-16">
+                        <span class="material-symbols-outlined text-6xl text-slate-200 mb-4">event_busy</span>
+                        <p class="text-slate-500">No college timetable published yet.</p>
+                        <p class="text-sm text-slate-400">Check back later for your institution's schedule.</p>
+                    </div>
+                </div>
+
+                <!-- Pending Tasks Section -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 mt-6">
+                    <h3 class="font-bold text-slate-800 mb-4 flex items-center gap-2">
+                        <span class="material-symbols-outlined">assignment</span>
+                        Pending Tasks
+                    </h3>
+                    <div id="tasksList" class="space-y-2">
+                        <p class="text-slate-400">No pending tasks.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // --- GLOBAL STATE ---
+        let collegeTimetable = null;
+        let customBlocks = {};
+        let studentTasks = [];
+        let selectedDay = "Monday";
+        const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+        const timeSlots = ["10:30-11:30", "11:30-12:30", "12:30-1:30", "1:30-2:30", "2:30-3:00", "3:00-4:00", "4:00-5:00"];
+
+        // --- INITIALIZATION ---
+        document.addEventListener('DOMContentLoaded', () => {
+            loadPersonalTimetable();
+            setupDaySelector();
+            setupLogout();
+        });
+
+        function setupLogout() {
+            document.getElementById('logoutBtn').addEventListener('click', () => {
+                window.location.href = '../PHP/logout.php';
+            });
+        }
+
+        function setupDaySelector() {
+            document.querySelectorAll('.day-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    selectedDay = btn.dataset.day;
+                    document.querySelectorAll('.day-btn').forEach(b => {
+                        b.className = 'day-btn w-full text-left px-4 py-3 rounded-xl hover:bg-slate-50 transition-colors text-slate-600';
+                    });
+                    btn.className = 'day-btn w-full text-left px-4 py-3 rounded-xl bg-blue-50 text-[#006ADC] font-semibold';
+                    renderTimetable();
+                });
+            });
+        }
+
+        // --- DATA LOADING ---
+        async function loadPersonalTimetable() {
+            try {
+                const res = await fetch('../PHP/get_student_timetable.php');
+                const data = await res.json();
+
+                document.getElementById('timetableLoader').classList.add('hidden');
+
+                if (!data.college_timetable) {
+                    document.getElementById('emptyState').classList.remove('hidden');
+                    return;
+                }
+
+                collegeTimetable = data.college_timetable;
+                customBlocks = data.custom_blocks || {};
+                studentTasks = data.tasks || [];
+
+                document.getElementById('timetableContent').classList.remove('hidden');
+                renderTimetable();
+                renderTasks();
+            } catch (err) {
+                console.error(err);
+                document.getElementById('emptyState').classList.remove('hidden');
+            }
+        }
+
+        // --- RENDER TIMETABLE ---
+        function renderTimetable() {
+            const tbody = document.getElementById('timetableBody');
+            tbody.innerHTML = '';
+
+            const dayIndex = days.indexOf(selectedDay);
+            const schedule = collegeTimetable?.schedules || {};
+            const activeSems = collegeTimetable?.activeSems || [1];
+            const semester = activeSems[0];
+            const daySchedule = schedule[semester]?.[dayIndex] || [];
+
+            const result = calculateFreeTime(daySchedule);
+            
+            // Update stats
+            document.getElementById('freeTimeDisplay').textContent = result.freeTimeText;
+            document.getElementById('classCount').textContent = result.classCount;
+            document.getElementById('taskCount').textContent = studentTasks.filter(t => {
+                const due = new Date(t.due_date);
+                const today = new Date();
+                return t.due_date && due.toDateString() === today.toDateString();
+            }).length || 0;
+
+            timeSlots.forEach((slot, index) => {
+                const slotData = daySchedule[index] || null;
+                const blockHtml = renderSmartBlock(slot, slotData, index, result);
+                tbody.innerHTML += blockHtml;
+            });
+        }
+
+        // --- SMART BLOCK RENDERER ---
+        window.renderSmartBlock = function(slot, slotData, slotIndex, freeCalc) {
+            const time = slot;
+            const isFree = !slotData || slotData === 'LUNCH';
+            const isLunch = slotData === 'LUNCH';
+
+            // Extract class name and teacher if available
+            let className = 'Free';
+            let teacher = '';
+            if (slotData && typeof slotData === 'string') {
+                const parts = slotData.split('<br>');
+                className = parts[0] || slotData;
+                teacher = parts[1] || '';
+            }
+
+            // Get pending subjects for this day
+            const pendingSubjs = getPendingSubjects(slotData);
+
+            // Get tasks due today
+            const dueTasks = studentTasks.filter(t => {
+                if (!t.due_date) return false;
+                const due = new Date(t.due_date);
+                const today = new Date();
+                return due.toDateString() === today.toDateString() && t.subject === className;
+            });
+
+            // Build status indicators
+            let statusHtml = '';
+            if (isLunch) {
+                statusHtml = '<span class="px-2 py-1 rounded-lg bg-yellow-100 text-yellow-700 text-xs font-bold">LUNCH</span>';
+            } else if (isFree) {
+                statusHtml = `
+                    <button onclick="addStudyBlock('${time}', ${slotIndex})" 
+                        class="px-3 py-1 rounded-lg bg-green-100 text-green-700 text-xs font-bold hover:bg-green-200 transition-colors">
+                        + Add Study
+                    </button>`;
+            } else {
+                statusHtml = `
+                    <button onclick="removeStudyBlock('${time}', ${slotIndex})" 
+                        class="px-3 py-1 rounded-lg bg-blue-100 text-blue-700 text-xs font-bold hover:bg-blue-200 transition-colors">
+                        Add to Calendar
+                    </button>`;
+            }
+
+            // Build the block HTML
+            const html = `
+                <tr class="border-b border-slate-100 hover:bg-slate-50 transition-colors">
+                    <td class="p-4 border-r border-slate-100">
+                        <span class="font-bold text-slate-700">${time}</span>
+                    </td>
+                    <td class="p-4 border-r border-slate-100">
+                        <div class="font-semibold ${isFree ? 'text-slate-300' : 'text-slate-800'}">
+                            ${isLunch ? 'LUNCH BREAK' : className}
+                        </div>
+                        ${teacher ? `<div class="text-xs text-slate-500 mt-1">${teacher}</div>` : ''}
+                        ${pendingSubjs.length > 0 && !isFree ? `
+                            <div class="mt-2 pt-2 border-t border-slate-100">
+                                <div class="text-xs text-slate-400 font-bold uppercase">Pending:</div>
+                                ${pendingSubjs.map(s => `<div class="text-xs text-orange-600">• ${s}</div>`).join('')}
+                            </div>
+                        ` : ''}
+                        ${dueTasks.length > 0 && !isFree ? `
+                            <div class="mt-2 pt-2 border-t border-slate-100">
+                                <div class="text-xs text-slate-400 font-bold uppercase">Due Today:</div>
+                                ${dueTasks.map(t => `
+                                    <div class="text-xs text-red-600 font-medium">
+                                        <span class="font-bold">${t.priority === 'high' ? '!' : ''}</span>${t.task_name}
+                                    </div>
+                                `).join('')}
+                            </div>
+                        ` : ''}
+                    </td>
+                    <td class="p-4">
+                        ${statusHtml}
+                    </td>
+                </tr>
+            `;
+            return html;
+        };
+
+        // --- FREE TIME CALCULATOR ---
+        window.calculateFreeTime = function(daySchedule) {
+            let freeSlots = 0;
+            let classCount = 0;
+
+            daySchedule.forEach(slot => {
+                if (!slot || slot === 'LUNCH') {
+                    freeSlots++;
+                } else {
+                    classCount++;
+                }
+            });
+
+            const freeMinutes = freeSlots * 30;
+            const hours = Math.floor(freeMinutes / 60);
+            const mins = freeMinutes % 60;
+
+            return {
+                freeTimeText: hours > 0 ? `${hours}h ${mins}m` : `${mins}m`,
+                classCount: classCount,
+                freeSlots: freeSlots
+            };
+        };
+
+        // --- HELPER FUNCTIONS ---
+        function getPendingSubjects(slotData) {
+            // For now, return empty - can be enhanced with actual subject tracking
+            return [];
+        }
+
+        window.addStudyBlock = function(time, index) {
+            const activity = prompt(`What do you want to do at ${time}?`, "Self Study");
+            if (!activity) return;
+
+            customBlocks[selectedDay] = customBlocks[selectedDay] || {};
+            customBlocks[selectedDay][time] = activity;
+            
+            renderTimetable();
+        };
+
+        window.removeStudyBlock = function(time, index) {
+            if (customBlocks[selectedDay] && customBlocks[selectedDay][time]) {
+                delete customBlocks[selectedDay][time];
+                renderTimetable();
+            }
+        };
+
+        // --- SAVE ---
+        window.savePersonalTimetable = async function() {
+            try {
+                const res = await fetch('../PHP/save_student_timetable.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ custom_blocks: customBlocks })
+                });
+                const data = await res.json();
+                
+                if (data.success) {
+                    alert('✓ Timetable saved!');
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Failed to save timetable.');
+            }
+        };
+
+        // --- TASKS RENDERING ---
+        function renderTasks() {
+            const container = document.getElementById('tasksList');
+            
+            if (studentTasks.length === 0) {
+                container.innerHTML = '<p class="text-slate-400">No pending tasks.</p>';
+                return;
+            }
+
+            container.innerHTML = studentTasks.map(task => `
+                <div class="flex items-center justify-between p-3 rounded-xl bg-slate-50">
+                    <div>
+                        <div class="font-medium ${task.priority === 'high' ? 'text-red-600' : 'text-slate-700'}">
+                            ${task.priority === 'high' ? '⚠ ' : ''}${task.task_name}
+                        </div>
+                        <div class="text-xs text-slate-500">${task.subject} • Due: ${task.due_date || 'No date'}</div>
+                    </div>
+                    <span class="px-2 py-1 rounded-lg text-xs font-bold ${
+                        task.priority === 'high' ? 'bg-red-100 text-red-700' :
+                        task.priority === 'medium' ? 'bg-yellow-100 text-yellow-700' :
+                        'bg-slate-100 text-slate-500'
+                    }">${task.priority}</span>
+                </div>
+            `).join('');
+        }
+    </script>
 </body>
 
 </html>

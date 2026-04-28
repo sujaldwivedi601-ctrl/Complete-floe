@@ -25,6 +25,15 @@
                 <input type="password" id="password" name="password" placeholder="Enter password" required>
             </div>
 
+            <div class="input-group">
+                <label>Login as</label>
+                <input type="hidden" id="role" name="role" value="">
+                <div class="role-buttons">
+                    <button type="button" class="role-btn" onclick="selectRole('student')" data-role="student">I am a Student</button>
+                    <button type="button" class="role-btn" onclick="selectRole('teacher')" data-role="teacher">I am a Teacher</button>
+                </div>
+            </div>
+
             <button type="submit" class="login-btn">Login</button>
         </form>
 
@@ -35,5 +44,16 @@
         </div>
     </div>
 
+    <script>
+        function selectRole(role) {
+            document.getElementById('role').value = role;
+            document.querySelectorAll('.role-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.role === role) {
+                    btn.classList.add('active');
+                }
+            });
+        }
+    </script>
 </body>
 </html>

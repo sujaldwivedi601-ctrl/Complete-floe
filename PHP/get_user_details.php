@@ -12,7 +12,7 @@ if (!isset($_SESSION['id'])) {
 $user_id = $_SESSION['id'];
 
 // Fetch user details from database
-$stmt = mysqli_prepare($conn, "SELECT user_name, email, role, institution FROM user_accounts WHERE id = ?");
+$stmt = mysqli_prepare($conn, "SELECT u.user_name, u.email, u.role, u.institution, u.college_id, c.code as college_code FROM user_accounts u LEFT JOIN colleges c ON u.college_id = c.id WHERE u.id = ?");
 if ($stmt) {
     mysqli_stmt_bind_param($stmt, "i", $user_id);
     mysqli_stmt_execute($stmt);

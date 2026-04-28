@@ -15,15 +15,24 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // 2.5 Fetch saved timetables
             fetchTimetables();
+            
+            // 3. Fetch progress for students
+            if (data.role === 'Student') {
+                fetchProgress();
+            }
         })
         .catch(error => {
             console.error('Error fetching user data:', error);
         });
 
-    // 3. Setup Logout
-    document.getElementById('logoutBtn').addEventListener('click', () => {
-        window.location.href = '../PHP/logout.php'; 
-    });
+    // 4. Setup Logout
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', () => {
+            fetch('../PHP/logout.php', { method: 'POST' })
+                .then(() => window.location.href = 'login.html');
+        });
+    }
 });
 
 function updateDashboardUI(user) {
@@ -34,6 +43,18 @@ function updateDashboardUI(user) {
     document.getElementById('profileEmail').textContent = user.email || "N/A";
     document.getElementById('profileRole').textContent = user.role || "User";
     document.getElementById('profileInst').textContent = user.institution || "Not Specified";
+
+    // Show college timetable for students
+    const role = (user.role || '').toLowerCase();
+    if (role === 'student') {
+        const section = document.getElementById('collegeTimetableSection');
+        if (section) {
+            section.style.display = 'block';
+            if (typeof loadCollegeTimetable === 'function') {
+                loadCollegeTimetable();
+            }
+        }
+    }
 }
 
 function fetchTimetables() {
@@ -81,15 +102,19 @@ function renderTimetables(list) {
                     <span class="material-symbols-outlined">calendar_today</span>
                 </div>
                 <div class="flex gap-1">
+                    ${item.is_public == 1 ? '<span class="p-2 text-green-500" title="Global"><span class="material-symbols-outlined text-xl">public</span></span>' : ''}
+                    <button onclick="makeGlobal(${item.id})" class="p-2 text-slate-300 hover:text-green-500 transition-colors" title="Make Global">
+                        <span class="material-symbols-outlined text-xl">public</span>
+                    </button>
                     <button onclick="deleteTimetable(${item.id})" class="p-2 text-slate-300 hover:text-red-500 transition-colors">
                         <span class="material-symbols-outlined text-xl">delete</span>
                     </button>
                 </div>
             </div>
-            
+
             <h3 class="text-lg font-bold text-slate-800 mb-1 group-hover:text-[#006ADC] transition-colors">${item.title}</h3>
             <p class="text-xs font-bold text-[#006ADC] uppercase tracking-widest mb-4 bg-blue-50 inline-block px-2 py-1 rounded-lg">${item.type}</p>
-            
+
             <div class="flex items-center justify-between pt-4 border-t border-slate-50">
                 <span class="text-[10px] text-slate-400 font-medium">${new Date(item.created_at).toLocaleDateString()}</span>
                 <a href="view_timetable.html?id=${item.id}" class="flex items-center gap-1 text-sm font-bold text-[#006ADC] group-hover:gap-2 transition-all">
@@ -116,4 +141,101 @@ window.deleteTimetable = function(id) {
             alert(data.error);
         }
     });
+};
+
+window.makeGlobal = function(id) {
+    if (!confirm("Make this timetable global? All students in your college will be able to see it.")) return;
+
+    fetch('../PHP/make_global_timetable.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: id })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            alert("✓ Timetable is now global! All students can see it.");
+            fetchTimetables(); // Refresh list
+        } else {
+            alert("Error: " + data.error);
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        alert("Failed to make timetable global.");
+    });
+};
+
+// --- PROGRESS TRACKING ---
+
+async function fetchProgress() {
+    try {
+        const res = await fetch('../PHP/get_progress.php');
+        const data = await res.json();
+        
+        if (data.success) {
+            renderProgressCards(data);
+        }
+    } catch (err) {
+        console.error('Error fetching progress:', err);
+    }
+}
+
+window.renderProgressCards = function(data) {
+    const section = document.getElementById('progress-section');
+    if (!section) return;
+    
+    section.style.display = 'block';
+    
+    // Update streak
+    const streakEl = document.getElementById('streakCount');
+    if (streakEl) streakEl.textContent = data.streak || 0;
+    
+    // Update week done
+    const weekDoneEl = document.getElementById('weekDone');
+    if (weekDoneEl) weekDoneEl.textContent = data.tasks_this_week || 0;
+    
+    // Update completion rate
+    const completionEl = document.getElementById('completionRate');
+    if (completionEl) completionEl.textContent = (data.completion_rate || 0) + '%';
+};
+
+window.askAIMotivation = async function() {
+    const card = document.getElementById('motivationCard');
+    const text = document.getElementById('motivationText');
+    const btn = card?.parentElement?.querySelector('button');
+    
+    if (!card || !text) return;
+    
+    if (btn) btn.disabled = true;
+    card.classList.remove('hidden');
+    text.textContent = 'Getting your motivation...';
+    
+    try {
+        const res = await fetch('../PHP/get_progress.php');
+        const data = await res.json();
+        
+        // Build a simple motivation based on stats
+        let motivation = '';
+        const streak = data.streak || 0;
+        const weekDone = data.tasks_this_week || 0;
+        const rate = data.completion_rate || 0;
+        
+        if (streak >= 7) {
+            motivation = `Incredible! ${streak} days straight! You're on fire! 🔥 Keep this momentum going!`;
+        } else if (streak >= 3) {
+            motivation = `Great work! ${streak} day streak! You've built a solid habit. ${weekDone} tasks this week - ${rate}% completion. Keep it up!`;
+        } else if (weekDone > 0) {
+            motivation = `Nice progress! You completed ${weekDone} tasks this week. ${rate}% of your tasks done. Start a streak by doing one more task tomorrow!`;
+        } else {
+            motivation = `Every expert was once a beginner! Complete one task today to start your streak. You've got this! 💪`;
+        }
+        
+        text.textContent = motivation;
+    } catch (err) {
+        console.error(err);
+        text.textContent = 'Keep pushing forward! One step at a time.';
+    } finally {
+        if (btn) btn.disabled = false;
+    }
 };
