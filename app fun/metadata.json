@@ -1,0 +1,6 @@
+{
+  "name": "Vanilla StudentOS Dashboard",
+  "description": "A high-density student productivity dashboard built with vanilla HTML/CSS/JS, featuring a 3D Three.js visualization and Gemini AI verification quizzes.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}

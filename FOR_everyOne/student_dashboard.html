@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard - Precision Architect</title>
+    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .tab-active { border-bottom: 2px solid #006ADC; color: #006ADC; }
+        .practical-badge { background: #fef3c7; color: #92400e; border: 1px solid #fcd34d; }
+        .theory-badge { background: #dbeafe; color: #1e40af; border: 1px solid #93c5fd; }
+        .lunch-row { background: #fefce8 !important; }
+        .copied-row { background: #f1f5f9; opacity: 0.8; }
+        .custom-row { background: #ecfdf5; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen">
+    <header class="h-16 bg-white/80 backdrop-blur-md sticky top-0 z-50 w-full border-b border-slate-200">
+        <div class="flex justify-between items-center w-full px-6 py-4 max-w-7xl mx-auto h-full">
+            <div class="text-2xl font-extrabold text-[#006ADC] flex items-center gap-2">
+                <span class="material-symbols-outlined text-blue-600 text-3xl">architecture</span>
+                Precision Architect
+            </div>
+            <nav class="hidden md:flex items-center gap-4">
+                <a class="font-medium text-sm text-slate-600 px-4 py-2 rounded-lg hover:bg-slate-100" href="index.html">Home</a>
+                <a class="font-medium text-sm text-blue-700 bg-blue-50 px-4 py-2 rounded-lg" href="student_dashboard.html">My Timetable</a>
+                <a class="font-medium text-sm text-slate-600 px-4 py-2 rounded-lg hover:bg-slate-100" href="goals.html">Goals</a>
+                <button id="logoutBtn" class="font-medium text-sm text-slate-600 px-4 py-2 rounded-lg border border-slate-200 hover:bg-slate-100">Logout</button>
+            </nav>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-6 py-8">
+        <!-- Day Selector -->
+        <div class="flex items-center gap-4 mb-6 overflow-x-auto pb-2">
+            <button onclick="selectDay('Monday')" id="day-Monday" class="day-btn px-4 py-2 rounded-xl font-semibold whitespace-nowrap">Monday</button>
+            <button onclick="selectDay('Tuesday')" id="day-Tuesday" class="day-btn px-4 py-2 rounded-xl font-semibold whitespace-nowrap">Tuesday</button>
+            <button onclick="selectDay('Wednesday')" id="day-Wednesday" class="day-btn px-4 py-2 rounded-xl font-semibold whitespace-nowrap">Wednesday</button>
+            <button onclick="selectDay('Thursday')" id="day-Thursday" class="day-btn px-4 py-2 rounded-xl font-semibold whitespace-nowrap">Thursday</button>
+            <button onclick="selectDay('Friday')" id="day-Friday" class="day-btn px-4 py-2 rounded-xl font-semibold whitespace-nowrap">Friday</button>
+            <button onclick="selectDay('Saturday')" id="day-Saturday" class="day-btn px-4 py-2 rounded-xl font-semibold whitespace-nowrap">Saturday</button>
+        </div>
+
+        <!-- Tab Buttons -->
+        <div class="flex border-b border-slate-200 mb-6">
+            <button onclick="switchTab('college')" id="tab-college" class="tab-btn px-6 py-3 font-bold text-slate-600 tab-active">
+                <span class="material-symbols-outlined align-middle mr-2">school</span>
+                College Timetable
+            </button>
+            <button onclick="switchTab('personal')" id="tab-personal" class="tab-btn px-6 py-3 font-bold text-slate-600">
+                <span class="material-symbols-outlined align-middle mr-2">person</span>
+                My Timetable
+            </button>
+        </div>
+
+        <!-- Tab 1: College Timetable (Read Only) -->
+        <div id="college-tab" class="tab-content">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="p-4 bg-blue-50 border-b border-slate-200 flex justify-between items-center">
+                    <h2 class="font-bold text-lg text-slate-800 flex items-center gap-2">
+                        <span class="material-symbols-outlined text-blue-600">calendar_month</span>
+                        College Timetable - <span id="collegeDayName">Monday</span>
+                    </h2>
+                    <span class="text-sm text-slate-500">Read Only</span>
+                </div>
+
+                <div id="collegeLoader" class="flex justify-center py-20">
+                    <div class="w-12 h-12 border-4 border-slate-200 border-t-blue-600 rounded-full animate-spin"></div>
+                </div>
+
+                <div id="collegeEmpty" class="hidden text-center py-16">
+                    <span class="material-symbols-outlined text-6xl text-slate-200 mb-4">event_busy</span>
+                    <p class="text-slate-500 font-medium">No college timetable published yet</p>
+                    <p class="text-sm text-slate-400">Check back later for your institution's schedule</p>
+                </div>
+
+                <table id="collegeTable" class="w-full hidden">
+                    <thead class="bg-slate-50">
+                        <tr>
+                            <th class="p-4 text-left text-sm font-bold text-slate-500 w-32">Time</th>
+                            <th class="p-4 text-left text-sm font-bold text-slate-500">Subject</th>
+                            <th class="p-4 text-left text-sm font-bold text-slate-500 w-40">Teacher</th>
+                            <th class="p-4 text-left text-sm font-bold text-slate-500 w-32">Type</th>
+                        </tr>
+                    </thead>
+                    <tbody id="collegeBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Tab 2: My Timetable (Personal) -->
+        <div id="personal-tab" class="tab-content hidden">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="p-4 bg-green-50 border-b border-slate-200 flex justify-between items-center">
+                    <h2 class="font-bold text-lg text-slate-800 flex items-center gap-2">
+                        <span class="material-symbols-outlined text-green-600">person</span>
+                        My Timetable - <span id="personalDayName">Monday</span>
+                    </h2>
+                    <button onclick="savePersonalTimetable()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-bold flex items-center gap-2">
+                        <span class="material-symbols-outlined text-sm">save</span>
+                        Save
+                    </button>
+                </div>
+
+                <div id="personalEmpty" class="hidden text-center py-16">
+                    <span class="material-symbols-outlined text-6xl text-slate-200 mb-4">event_note</span>
+                    <p class="text-slate-500 font-medium">Start adding your custom time blocks</p>
+                    <p class="text-sm text-slate-400">Copy from college timetable or add your own</p>
+                </div>
+
+                <table id="personalTable" class="w-full">
+                    <thead class="bg-slate-50">
+                        <tr>
+                            <th class="p-4 text-left text-sm font-bold text-slate-500 w-32">Time</th>
+                            <th class="p-4 text-left text-sm font-bold text-slate-500">Subject / Activity</th>
+                            <th class="p-4 text-left text-sm font-bold text-slate-500 w-40">Teacher</th>
+                            <th class="p-4 text-left text-sm font-bold text-slate-500 w-32">Source</th>
+                            <th class="p-4 text-left text-sm font-bold text-slate-500 w-24">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="personalBody"></tbody>
+                </table>
+
+                <!-- Add Custom Block Form -->
+                <div class="p-4 border-t border-slate-200 bg-slate-50">
+                    <h3 class="font-bold text-slate-700 mb-3">Add Custom Time Block</h3>
+                    <div class="flex flex-wrap gap-3 items-end">
+                        <div class="flex-1 min-w-[200px]">
+                            <label class="block text-xs text-slate-500 mb-1">Activity</label>
+                            <input type="text" id="customActivity" placeholder="e.g., Self Study — Python" class="w-full px-4 py-2 rounded-lg border border-slate-200">
+                        </div>
+                        <div class="w-32">
+                            <label class="block text-xs text-slate-500 mb-1">Time</label>
+                            <select id="customTime" class="w-full px-4 py-2 rounded-lg border border-slate-200">
+                                <option value="">Select time</option>
+                            </select>
+                        </div>
+                        <button onclick="addCustomBlock()" class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-bold">
+                            <span class="material-symbols-outlined align-middle">add</span>
+                            Add
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Task Manager Section -->
+        <div class="mt-8">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-slate-800 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-purple-600">assignment</span>
+                    Task Manager
+                </h2>
+                <button onclick="showAddTaskForm()" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg font-bold flex items-center gap-2">
+                    <span class="material-symbols-outlined">add</span>
+                    Add Task
+                </button>
+            </div>
+
+            <!-- Summary Stats -->
+            <div id="taskSummary" class="grid grid-cols-3 gap-4 mb-6">
+                <div class="bg-white p-4 rounded-xl border border-slate-200">
+                    <div class="text-sm text-slate-500">Class Hours Today</div>
+                    <div id="classHours" class="text-2xl font-bold text-blue-600">0 hrs</div>
+                </div>
+                <div class="bg-white p-4 rounded-xl border border-slate-200">
+                    <div class="text-sm text-slate-500">Free Hours</div>
+                    <div id="freeHours" class="text-2xl font-bold text-green-600">0 hrs</div>
+                </div>
+                <div class="bg-white p-4 rounded-xl border border-slate-200">
+                    <div class="text-sm text-slate-500">Pending Tasks</div>
+                    <div id="pendingTasks" class="text-2xl font-bold text-orange-600">0</div>
+                </div>
+            </div>
+
+            <!-- Task List -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                <div id="taskList" class="divide-y divide-slate-100">
+                    <div class="p-8 text-center text-slate-400">Loading tasks...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add Task Modal -->
+        <div id="addTaskModal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center">
+            <div class="bg-white rounded-2xl p-6 w-full max-w-md mx-4">
+                <h3 class="text-xl font-bold text-slate-800 mb-4">Add New Task</h3>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-600 mb-1">Task Name</label>
+                        <input type="text" id="newTaskName" placeholder="e.g., Study Python" class="w-full px-4 py-2 rounded-lg border border-slate-200">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-600 mb-1">Subject</label>
+                        <select id="newTaskSubject" class="w-full px-4 py-2 rounded-lg border border-slate-200">
+                            <option value="">Select Subject</option>
+                            <option value="Python">Python</option>
+                            <option value="DSA">DSA</option>
+                            <option value="C">C</option>
+                            <option value="Maths">Maths</option>
+                            <option value="Physics">Physics</option>
+                            <option value="Chemistry">Chemistry</option>
+                            <option value="English">English</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-600 mb-1">Planned Time</label>
+                        <select id="newTaskTime" class="w-full px-4 py-2 rounded-lg border border-slate-200">
+                            <option value="0.5">30 minutes</option>
+                            <option value="1">1 hour</option>
+                            <option value="1.5">1.5 hours</option>
+                            <option value="2">2 hours</option>
+                            <option value="3">3 hours</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="flex gap-3 mt-6">
+                    <button onclick="closeAddTaskModal()" class="flex-1 px-4 py-2 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50">Cancel</button>
+                    <button onclick="addNewTask()" class="flex-1 px-4 py-2 rounded-lg bg-purple-600 text-white font-bold hover:bg-purple-700">Add Task</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- AI Quiz Modal -->
+        <div id="quizModal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center">
+            <div class="bg-white rounded-2xl p-6 w-full max-w-lg mx-4">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+                        <span class="text-2xl">🤖</span>
+                        AI Verification Quiz
+                    </h3>
+                    <button onclick="closeQuizModal()" class="text-slate-400 hover:text-slate-600">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                </div>
+                <div id="quizContent" class="space-y-4">
+                    <p id="quizIntro" class="text-slate-600">To mark this task as done, you need to pass a quick quiz!</p>
+                    <div id="questionArea" class="hidden">
+                        <div class="bg-purple-50 p-4 rounded-xl mb-4">
+                            <span class="text-xs font-bold text-purple-600">Question <span id="qNum">1</span>/10</span>
+                            <p id="questionText" class="font-medium text-slate-800 mt-1"></p>
+                        </div>
+                        <input type="text" id="answerInput" placeholder="Type your answer..." class="w-full px-4 py-3 rounded-lg border border-slate-200">
+                    </div>
+                    <div id="quizResult" class="hidden text-center py-6">
+                        <span id="resultIcon" class="text-6xl block mb-4"></span>
+                        <p id="resultText" class="text-xl font-bold"></p>
+                    </div>
+                </div>
+                <div class="flex gap-3 mt-6">
+                    <button id="quizCloseBtn" onclick="closeQuizModal()" class="flex-1 px-4 py-2 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50">Close</button>
+                    <button id="quizActionBtn" onclick="startQuiz()" class="flex-1 px-4 py-2 rounded-lg bg-purple-600 text-white font-bold hover:bg-purple-700">Start Quiz</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // --- GLOBAL STATE ---
+        let collegeTimetable = null;
+        let personalBlocks = {};
+        let selectedDay = "Monday";
+        let currentTab = "college";
+
+        const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+        const timeSlots = ["10:30-11:30", "11:30-12:30", "12:30-1:30", "1:30-2:30", "2:30-3:00", "3:00-4:00", "4:00-5:00"];
+
+        // --- INITIALIZATION ---
+        document.addEventListener('DOMContentLoaded', () => {
+            loadData();
+            selectDay('Monday');
+            populateTimeSelect();
+            setupLogout();
+        });
+
+        function setupLogout() {
+            document.getElementById('logoutBtn').addEventListener('click', () => {
+                window.location.href = '../PHP/logout.php';
+            });
+        }
+
+        function populateTimeSelect() {
+            const select = document.getElementById('customTime');
+            timeSlots.forEach(slot => {
+                const opt = document.createElement('option');
+                opt.value = slot;
+                opt.textContent = slot;
+                select.appendChild(opt);
+            });
+        }
+
+        // --- DATA LOADING ---
+        async function loadData() {
+            try {
+                const res = await fetch('../PHP/get_student_timetable.php');
+                const data = await res.json();
+
+                collegeTimetable = data.college_timetable;
+                personalBlocks = data.custom_blocks || {};
+
+                // Ensure structure
+                days.forEach(day => {
+                    if (!personalBlocks[day]) personalBlocks[day] = {};
+                });
+
+                renderCollegeTable();
+                renderPersonalTable();
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        // --- DAY SELECTOR ---
+        window.selectDay = function(day) {
+            selectedDay = day;
+            days.forEach(d => {
+                const btn = document.getElementById('day-' + d);
+                if (d === day) {
+                    btn.className = 'day-btn px-4 py-2 rounded-xl font-semibold whitespace-nowrap bg-blue-600 text-white';
+                } else {
+                    btn.className = 'day-btn px-4 py-2 rounded-xl font-semibold whitespace-nowrap bg-slate-100 text-slate-600 hover:bg-slate-200';
+                }
+            });
+            document.getElementById('collegeDayName').textContent = day;
+            document.getElementById('personalDayName').textContent = day;
+            renderCollegeTable();
+            renderPersonalTable();
+        };
+
+        // --- TAB SWITCHER ---
+        window.switchTab = function(tab) {
+            currentTab = tab;
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('tab-active'));
+            document.getElementById('tab-' + tab).classList.add('tab-active');
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+            document.getElementById(tab + '-tab').classList.remove('hidden');
+            renderCollegeTable();
+            renderPersonalTable();
+        };
+
+        // --- COLLEGE TABLE RENDER ---
+        function renderCollegeTable() {
+            const tbody = document.getElementById('collegeBody');
+            const loader = document.getElementById('collegeLoader');
+            const empty = document.getElementById('collegeEmpty');
+            const table = document.getElementById('collegeTable');
+
+            if (!collegeTimetable) {
+                loader.classList.add('hidden');
+                empty.classList.remove('hidden');
+                return;
+            }
+
+            loader.classList.add('hidden');
+            empty.classList.add('hidden');
+            table.classList.remove('hidden');
+            tbody.innerHTML = '';
+
+            const td = collegeTimetable.timetable_data;
+            const schedules = td.schedules;
+            const activeSems = td.activeSems;
+            const semester = activeSems[0];
+            const dayIndex = days.indexOf(selectedDay);
+            const daySchedule = schedules[semester]?.[dayIndex] || [];
+
+            timeSlots.forEach((slot, index) => {
+                const slotData = daySchedule[index];
+                const row = document.createElement('tr');
+
+                if (slotData === 'LUNCH') {
+                    row.className = 'lunch-row border-b border-slate-100';
+                    row.innerHTML = `
+                        <td class="p-4 font-bold text-slate-700">${slot}</td>
+                        <td class="p-4 font-bold text-yellow-700">LUNCH BREAK</td>
+                        <td class="p-4 text-slate-500">—</td>
+                        <td class="p-4"><span class="px-2 py-1 rounded-lg bg-yellow-100 text-yellow-700 text-xs font-bold">LUNCH</span></td>
+                    `;
+                } else if (slotData) {
+                    const isPractical = slotData.includes('(P-');
+                    const isTheory = slotData.includes('(T-');
+
+                    // Parse subject and teacher
+                    let subject = slotData.split('<br>')[0] || '';
+                    let teacher = slotData.split('<br>')[1] || '';
+                    teacher = teacher.replace(/[()]/g, '').replace('P-', '').replace('T-', '').trim();
+
+                    row.className = 'border-b border-slate-100 hover:bg-slate-50';
+                    row.innerHTML = `
+                        <td class="p-4 font-bold text-slate-700">${slot}</td>
+                        <td class="p-4 font-semibold text-slate-800">${subject}</td>
+                        <td class="p-4 text-slate-600">${teacher || '—'}</td>
+                        <td class="p-4">
+                            ${isPractical ? '<span class="px-2 py-1 rounded-lg text-xs font-bold practical-badge">🧪 Practical</span>' :
+                            isTheory ? '<span class="px-2 py-1 rounded-lg text-xs font-bold theory-badge">📖 Theory</span>' :
+                            '<span class="text-slate-400 text-xs">—</span>'}
+                        </td>
+                    `;
+                } else {
+                    row.className = 'border-b border-slate-100 bg-slate-50';
+                    row.innerHTML = `
+                        <td class="p-4 font-bold text-slate-400">${slot}</td>
+                        <td class="p-4 text-slate-400">—</td>
+                        <td class="p-4 text-slate-400">—</td>
+                        <td class="p-4"><span class="text-slate-400 text-xs">Free</span></td>
+                    `;
+                }
+
+                tbody.appendChild(row);
+            });
+        }
+
+        // --- PERSONAL TABLE RENDER ---
+        function renderPersonalTable() {
+            const tbody = document.getElementById('personalBody');
+            tbody.innerHTML = '';
+
+            const dayBlocks = personalBlocks[selectedDay] || {};
+            const collegeData = collegeTimetable?.timetable_data;
+            const schedules = collegeData?.schedules;
+            const activeSems = collegeData?.activeSems || [1];
+            const semester = activeSems[0];
+            const dayIndex = days.indexOf(selectedDay);
+            const collegeDay = schedules?.[semester]?.[dayIndex] || [];
+
+            timeSlots.forEach((slot, index) => {
+                const collegeSlot = collegeDay[index];
+                const customSlot = dayBlocks[slot];
+                const row = document.createElement('tr');
+
+                // Check if it's a custom block
+                if (customSlot && typeof customSlot === 'object' && customSlot.source === 'custom') {
+                    // Custom block (editable)
+                    row.className = 'custom-row border-b border-slate-200';
+                    row.innerHTML = `
+                        <td class="p-4 font-bold text-slate-700">${slot}</td>
+                        <td class="p-4 font-semibold text-green-700">${customSlot.activity}</td>
+                        <td class="p-4 text-slate-500">—</td>
+                        <td class="p-4"><span class="px-2 py-1 rounded-lg bg-green-100 text-green-700 text-xs font-bold">My Custom</span></td>
+                        <td class="p-4">
+                            <button onclick="editBlock('${slot}')" class="text-blue-600 hover:text-blue-800 mr-2">
+                                <span class="material-symbols-outlined text-sm">edit</span>
+                            </button>
+                            <button onclick="deleteBlock('${slot}')" class="text-red-600 hover:text-red-800">
+                                <span class="material-symbols-outlined text-sm">delete</span>
+                            </button>
+                        </td>
+                    `;
+                } else if (collegeSlot && collegeSlot !== 'LUNCH') {
+                    // Copied from college (read-only)
+                    const isPractical = collegeSlot.includes('(P-');
+                    const subject = collegeSlot.split('<br>')[0] || '';
+                    const teacher = collegeSlot.split('<br>')[1] || '';
+                    const teacherName = teacher.replace(/[()]/g, '').replace('P-', '').replace('T-', '').trim();
+
+                    row.className = 'copied-row border-b border-slate-200';
+                    row.innerHTML = `
+                        <td class="p-4 font-bold text-slate-500">${slot}</td>
+                        <td class="p-4 font-semibold text-slate-600">${subject}</td>
+                        <td class="p-4 text-slate-500">${teacherName || '—'}</td>
+                        <td class="p-4"><span class="px-2 py-1 rounded-lg bg-slate-200 text-slate-600 text-xs font-bold">College</span></td>
+                        <td class="p-4">
+                            <button onclick="copyFromCollege('${slot}')" class="text-green-600 hover:text-green-800 text-xs">
+                                <span class="material-symbols-outlined text-sm">add</span>
+                            </button>
+                        </td>
+                    `;
+                } else if (collegeSlot === 'LUNCH') {
+                    row.className = 'lunch-row border-b border-slate-200';
+                    row.innerHTML = `
+                        <td class="p-4 font-bold text-slate-700">${slot}</td>
+                        <td class="p-4 font-bold text-yellow-700">LUNCH BREAK</td>
+                        <td class="p-4 text-slate-500">—</td>
+                        <td class="p-4"><span class="px-2 py-1 rounded-lg bg-yellow-100 text-yellow-700 text-xs font-bold">LUNCH</span></td>
+                        <td class="p-4">—</td>
+                    `;
+                } else {
+                    // Free slot - can add custom
+                    row.className = 'border-b border-slate-100';
+                    row.innerHTML = `
+                        <td class="p-4 font-bold text-slate-400">${slot}</td>
+                        <td class="p-4 text-slate-400">Free</td>
+                        <td class="p-4 text-slate-400">—</td>
+                        <td class="p-4"><span class="text-slate-400 text-xs">—</span></td>
+                        <td class="p-4">
+                            <button onclick="addToThisTime('${slot}')" class="text-green-600 hover:text-green-800">
+                                <span class="material-symbols-outlined text-sm">add</span>
+                            </button>
+                        </td>
+                    `;
+                }
+
+                tbody.appendChild(row);
+            });
+        }
+
+        // --- ACTIONS ---
+        window.copyFromCollege = function(slot) {
+            const collegeData = collegeTimetable.timetable_data;
+            const schedule = collegeData.schedules;
+            const activeSems = collegeData.activeSems[0];
+            const dayIndex = days.indexOf(selectedDay);
+            const collegeDay = schedule[activeSems][dayIndex];
+            const slotIndex = timeSlots.indexOf(slot);
+            const slotData = collegeDay[slotIndex];
+
+            if (slotData && slotData !== 'LUNCH') {
+                const subject = slotData.split('<br>')[0];
+                personalBlocks[selectedDay][slot] = {
+                    activity: subject,
+                    source: 'copied'
+                };
+                renderPersonalTable();
+            }
+        };
+
+        window.addToThisTime = function(slot) {
+            const activity = prompt(`What do you want to do at ${slot}?`, "Self Study");
+            if (!activity) return;
+
+            personalBlocks[selectedDay][slot] = {
+                activity: activity,
+                source: 'custom'
+            };
+            renderPersonalTable();
+        };
+
+        window.editBlock = function(slot) {
+            const current = personalBlocks[selectedDay][slot];
+            if (!current || current.source !== 'custom') return;
+
+            const activity = prompt(`Edit activity for ${slot}:`, current.activity);
+            if (!activity) return;
+
+            personalBlocks[selectedDay][slot].activity = activity;
+            renderPersonalTable();
+        };
+
+        window.deleteBlock = function(slot) {
+            if (confirm(`Delete this block at ${slot}?`)) {
+                delete personalBlocks[selectedDay][slot];
+                renderPersonalTable();
+            }
+        };
+
+        window.addCustomBlock = function() {
+            const activity = document.getElementById('customActivity').value.trim();
+            const time = document.getElementById('customTime').value;
+
+            if (!activity || !time) {
+                alert('Please enter activity and select time');
+                return;
+            }
+
+            personalBlocks[selectedDay][time] = {
+                activity: activity,
+                source: 'custom'
+            };
+
+            document.getElementById('customActivity').value = '';
+            document.getElementById('customTime').value = '';
+            renderPersonalTable();
+        };
+
+        // --- SAVE ---
+        window.savePersonalTimetable = async function() {
+            try {
+                const res = await fetch('../PHP/save_student_timetable.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ custom_blocks: personalBlocks })
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    alert('✓ Timetable saved successfully!');
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Failed to save timetable');
+            }
+        };
+
+        // ============================================
+        //         TASK MANAGER LOGIC
+        // ============================================
+
+        let studentTasks = [];
+        let teacherTasks = [];
+        let currentQuizTask = null;
+        let quizQuestions = [];
+        let quizAnswers = [];
+        let currentQIndex = 0;
+
+        // Load tasks
+        async function loadTasks() {
+            try {
+                const res = await fetch('../PHP/get_student_tasks.php');
+                const data = await res.json();
+
+                teacherTasks = data.teacher_tasks || [];
+                studentTasks = data.student_tasks || [];
+
+                updateTaskSummary();
+                renderTaskList();
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        // Update summary stats
+        function updateTaskSummary() {
+            const dayIndex = days.indexOf(selectedDay);
+            const collegeData = collegeTimetable?.timetable_data;
+            const schedule = collegeData?.schedules;
+            const activeSems = collegeData?.activeSems?.[0] || 1;
+            const daySchedule = schedule?.[activeSems]?.[dayIndex] || [];
+
+            let classHours = 0;
+            let freeSlots = 0;
+
+            daySchedule.forEach(slot => {
+                if (slot && slot !== 'LUNCH') classHours += 1;
+                else if (!slot) freeSlots += 1;
+            });
+
+            const pendingCount = [...teacherTasks, ...studentTasks].filter(t => t.status !== 'completed').length;
+
+            document.getElementById('classHours').textContent = classHours + ' hrs';
+            document.getElementById('freeHours').textContent = freeSlots + ' hrs';
+            document.getElementById('pendingTasks').textContent = pendingCount;
+        }
+
+        // Render task list
+        function renderTaskList() {
+            const container = document.getElementById('taskList');
+            const allTasks = [...teacherTasks, ...studentTasks];
+            const pending = allTasks.filter(t => t.status !== 'completed');
+            const completed = allTasks.filter(t => t.status === 'completed');
+
+            if (allTasks.length === 0) {
+                container.innerHTML = '<div class="p-8 text-center text-slate-400">No tasks yet. Add your first task!</div>';
+                return;
+            }
+
+            let html = '';
+
+            // Teacher tasks (TOP, HIGH priority)
+            teacherTasks.filter(t => t.status !== 'completed').forEach(task => {
+                html += renderTaskItem(task, true);
+            });
+
+            // Student tasks (pending)
+            studentTasks.filter(t => t.status !== 'completed').forEach(task => {
+                html += renderTaskItem(task, false);
+            });
+
+            // Completed
+            completed.forEach(task => {
+                html += renderTaskItem(task, task.source === 'teacher');
+            });
+
+            container.innerHTML = html;
+        }
+
+        function renderTaskItem(task, isTeacher) {
+            const isCompleted = task.status === 'completed';
+            const badge = isTeacher ?
+                '<span class="px-2 py-1 rounded-lg bg-red-100 text-red-700 text-xs font-bold">📌 Teacher Task</span>' :
+                '<span class="px-2 py-1 rounded-lg bg-purple-100 text-purple-700 text-xs font-bold">My Task</span>';
+
+            const statusBadge = isCompleted ?
+                '<span class="px-2 py-1 rounded-lg bg-green-100 text-green-700 text-xs font-bold">✅ Completed</span>' :
+                '<span class="px-2 py-1 rounded-lg bg-orange-100 text-orange-700 text-xs font-bold">⏳ Pending</span>';
+
+            const timeDisplay = task.planned_time ?
+                `<span class="text-xs text-slate-500">${task.planned_time} hr</span>` : '';
+
+            return `
+                <div class="p-4 flex items-center justify-between ${isCompleted ? 'bg-slate-50 opacity-60' : ''}">
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 rounded-full ${isTeacher ? 'bg-red-100' : 'bg-purple-100'} flex items-center justify-center">
+                            <span class="material-symbols-outlined ${isTeacher ? 'text-red-600' : 'text-purple-600'}">assignment</span>
+                        </div>
+                        <div>
+                            <div class="font-semibold text-slate-800 ${isCompleted ? 'line-through' : ''}">${task.title}</div>
+                            <div class="flex items-center gap-2 mt-1">
+                                <span class="text-xs bg-slate-100 px-2 py-0.5 rounded text-slate-600">${task.subject}</span>
+                                ${badge}
+                                ${statusBadge}
+                                ${timeDisplay}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        ${!isCompleted && !isTeacher ? `
+                            <button onclick="markTaskDone(${task.id})" class="px-3 py-1 rounded-lg bg-green-500 text-white text-sm font-bold hover:bg-green-600">Mark Done</button>
+                            <button onclick="deleteTask(${task.id})" class="p-2 text-red-400 hover:text-red-600">
+                                <span class="material-symbols-outlined">delete</span>
+                            </button>
+                        ` : ''}
+                        ${!isCompleted && isTeacher ? `
+                            <span class="text-xs text-slate-400">Teacher task - cannot delete</span>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+        }
+
+        window.showAddTaskForm = function() {
+            document.getElementById('addTaskModal').classList.remove('hidden');
+        };
+
+        window.closeAddTaskModal = function() {
+            document.getElementById('addTaskModal').classList.add('hidden');
+            document.getElementById('newTaskName').value = '';
+            document.getElementById('newTaskSubject').value = '';
+        };
+
+        window.addNewTask = async function() {
+            const title = document.getElementById('newTaskName').value.trim();
+            const subject = document.getElementById('newTaskSubject').value;
+            const planned_time = parseFloat(document.getElementById('newTaskTime').value);
+
+            if (!title || !subject) {
+                alert('Please fill in task name and subject');
+                return;
+            }
+
+            try {
+                const res = await fetch('../PHP/add_student_task.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ title, subject, planned_time })
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    closeAddTaskModal();
+                    loadTasks();
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Failed to add task');
+            }
+        };
+
+        window.deleteTask = async function(id) {
+            if (!confirm('Delete this task?')) return;
+
+            try {
+                const res = await fetch('../PHP/delete_student_task.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id })
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    loadTasks();
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        };
+
+        // ============================================
+        //         AI QUIZ VERIFICATION
+        // ============================================
+
+        window.markTaskDone = async function(taskId) {
+            currentQuizTask = [...teacherTasks, ...studentTasks].find(t => t.id === taskId);
+            if (!currentQuizTask) return;
+
+            currentQIndex = 0;
+            quizQuestions = [];
+            quizAnswers = [];
+
+            // Show quiz modal
+            document.getElementById('quizModal').classList.remove('hidden');
+            document.getElementById('quizIntro').classList.remove('hidden');
+            document.getElementById('questionArea').classList.add('hidden');
+            document.getElementById('quizResult').classList.add('hidden');
+            document.getElementById('quizCloseBtn').classList.add('hidden');
+            document.getElementById('quizActionBtn').textContent = 'Start Quiz';
+            document.getElementById('quizActionBtn').onclick = startQuiz;
+        };
+
+        window.startQuiz = async function() {
+            document.getElementById('quizIntro').classList.add('hidden');
+            document.getElementById('questionArea').classList.remove('hidden');
+            document.getElementById('quizActionBtn').textContent = 'Submit Answer';
+            document.getElementById('quizActionBtn').onclick = submitAnswer;
+
+            // Generate questions with AI
+            try {
+                const res = await fetch('../PHP/generate_quiz.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        subject: currentQuizTask.subject,
+                        task: currentQuizTask.title
+                    })
+                });
+                const data = await res.json();
+
+                if (data.success && data.questions) {
+                    quizQuestions = data.questions;
+                    showQuestion(0);
+                } else {
+                    alert('Failed to generate quiz. Try again later.');
+                    closeQuizModal();
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Error starting quiz');
+                closeQuizModal();
+            }
+        };
+
+        function showQuestion(index) {
+            if (index >= quizQuestions.length) {
+                // All questions answered - check with AI
+                checkQuizResults();
+                return;
+            }
+
+            currentQIndex = index;
+            document.getElementById('qNum').textContent = index + 1;
+            document.getElementById('questionText').textContent = quizQuestions[index];
+            document.getElementById('answerInput').value = '';
+        }
+
+        window.submitAnswer = function() {
+            const answer = document.getElementById('answerInput').value.trim();
+            if (!answer) {
+                alert('Please enter an answer');
+                return;
+            }
+
+            quizAnswers.push(answer);
+            showQuestion(currentQIndex + 1);
+        };
+
+        async function checkQuizResults() {
+            document.getElementById('questionArea').classList.add('hidden');
+            document.getElementById('quizActionBtn').textContent = 'Checking...';
+            document.getElementById('quizActionBtn').disabled = true;
+
+            try {
+                const res = await fetch('../PHP/check_quiz.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        questions: quizQuestions,
+                        answers: quizAnswers,
+                        subject: currentQuizTask.subject,
+                        task: currentQuizTask.title
+                    })
+                });
+                const data = await res.json();
+
+                document.getElementById('quizActionBtn').disabled = false;
+                document.getElementById('quizActionBtn').onclick = closeQuizModal;
+                document.getElementById('quizActionBtn').textContent = 'Close';
+                document.getElementById('quizCloseBtn').classList.remove('hidden');
+
+                if (data.pass) {
+                    // PASS - mark task completed
+                    document.getElementById('quizResult').classList.remove('hidden');
+                    document.getElementById('resultIcon').textContent = '✅';
+                    document.getElementById('resultText').textContent = 'PASS! Great job!';
+                    document.getElementById('resultText').className = 'text-xl font-bold text-green-600';
+
+                    await fetch('../PHP/complete_task.php', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ task_id: currentQuizTask.id })
+                    });
+                } else {
+                    // FAIL
+                    document.getElementById('quizResult').classList.remove('hidden');
+                    document.getElementById('resultIcon').textContent = '❌';
+                    document.getElementById('resultText').textContent = 'Need more practice. Try again tomorrow!';
+                    document.getElementById('resultText').className = 'text-xl font-bold text-red-600';
+                }
+
+                loadTasks();
+            } catch (err) {
+                console.error(err);
+                alert('Error checking quiz');
+            }
+        }
+
+        window.closeQuizModal = function() {
+            document.getElementById('quizModal').classList.add('hidden');
+            currentQuizTask = null;
+            quizQuestions = [];
+            quizAnswers = [];
+        };
+
+        // Load tasks on init
+        loadTasks();
+    </script>
+</body>
+</html>
