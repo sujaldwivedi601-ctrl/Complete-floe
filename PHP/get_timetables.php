@@ -22,19 +22,17 @@ if ($role === 'Student') {
     $stmt = mysqli_prepare($conn, "SELECT id, title, type, is_public, created_at FROM timetables WHERE user_id = ? ORDER BY created_at DESC");
     mysqli_stmt_bind_param($stmt, "i", $user_id);
 }
-    mysqli_stmt_execute($stmt);
-    $result = mysqli_stmt_get_result($stmt);
-    
-    $timetables = [];
-    while ($row = mysqli_fetch_assoc($result)) {
-        $timetables[] = $row;
-    }
-    
-    echo json_encode(['success' => true, 'timetables' => $timetables]);
-    mysqli_stmt_close($stmt);
-} else {
-    echo json_encode(['success' => false, 'error' => 'Database error']);
+
+mysqli_stmt_execute($stmt);
+$result = mysqli_stmt_get_result($stmt);
+
+$timetables = [];
+while ($row = mysqli_fetch_assoc($result)) {
+    $timetables[] = $row;
 }
+
+echo json_encode(['success' => true, 'timetables' => $timetables]);
+mysqli_stmt_close($stmt);
 
 mysqli_close($conn);
 ?>

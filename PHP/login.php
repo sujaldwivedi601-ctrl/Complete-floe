@@ -54,13 +54,15 @@ if (mysqli_num_rows($result) > 0) {
         // Fetch semester if student
         if ($row['role'] === 'Student') {
             $semStmt = mysqli_prepare($conn, "SELECT semester FROM user_accounts WHERE id = ?");
-            mysqli_stmt_bind_param($semStmt, "i", $row['id']);
-            mysqli_stmt_execute($semStmt);
-            $semResult = mysqli_stmt_get_result($semStmt);
-            if ($semRow = mysqli_fetch_assoc($semResult)) {
-                $_SESSION['semester'] = $semRow['semester'] ?? 1;
+            if ($semStmt) {
+                mysqli_stmt_bind_param($semStmt, "i", $row['id']);
+                mysqli_stmt_execute($semStmt);
+                $semResult = mysqli_stmt_get_result($semStmt);
+                if ($semRow = mysqli_fetch_assoc($semResult)) {
+                    $_SESSION['semester'] = $semRow['semester'] ?? 1;
+                }
+                mysqli_stmt_close($semStmt);
             }
-            mysqli_stmt_close($semStmt);
         }
 
         redirectByRole($row['role']);

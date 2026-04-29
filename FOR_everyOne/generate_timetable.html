@@ -27,7 +27,7 @@
   </style>
 </head>
 
-<body class="bg-slate-50 text-slate-800 min-h-screen relative" onload="insertNav('Teacher'); setActiveNav('generate_timetable.html')">
+  <body class="bg-slate-50 text-slate-800 min-h-screen relative">
   <div class="absolute top-[-10%] left-[-10%] w-96 h-96 bg-blue-400/20 rounded-full mix-blend-multiply filter blur-[80px] animate-float z-0"></div>
   <div class="absolute bottom-[-10%] right-[-5%] w-[30rem] h-[30rem] bg-indigo-400/20 rounded-full mix-blend-multiply filter blur-[100px] animate-float-delayed z-0"></div>
 
@@ -136,14 +136,18 @@
     </div>
   </main>
 
-  <script src="style.js"></script>
-  <script src="dashboard.js"></script>
-  <script>
-    document.getElementById('logoutBtn')?.addEventListener('click', () => {
-      fetch('../PHP/logout.php', { method: 'POST' })
-        .then(() => window.location.href = 'login.html');
-    });
-  </script>
+    <script src="style.js"></script>
+    <script src="dashboard.js"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        insertNav('Teacher');
+        setActiveNav('generate_timetable.html');
+      });
+      document.getElementById('logoutBtn')?.addEventListener('click', () => {
+        fetch('../PHP/logout.php', { method: 'POST', credentials: 'same-origin' })
+          .then(() => window.location.href = 'login.html');
+      });
+    </script>
 </body>
 
 </html>

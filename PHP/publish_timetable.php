@@ -17,11 +17,18 @@ if (!$data || !isset($data['timetable_id'])) {
 }
 
 $timetable_id = $data['timetable_id'];
+$user_id = $_SESSION['id'];
 $college_id = $_SESSION['college_id'] ?? null;
 
-$stmt = mysqli_prepare($conn, "UPDATE timetables SET is_public = 1 WHERE id = ? AND college_id = ?");
+// Only teachers/admins can publish
+if ($_SESSION['role'] !== 'Teacher' && $_SESSION['role'] !== 'Admin') {
+    echo json_encode(['success' => false, 'error' => 'Only teachers can publish timetables']);
+    exit();
+}
+
+$stmt = mysqli_prepare($conn, "UPDATE timetables SET is_public = 1 WHERE id = ? AND (user_id = ? OR college_id = ?)");
 if ($stmt) {
-    mysqli_stmt_bind_param($stmt, "ii", $timetable_id, $college_id);
+    mysqli_stmt_bind_param($stmt, "iii", $timetable_id, $user_id, $college_id);
     if (mysqli_stmt_execute($stmt)) {
         echo json_encode(['success' => true, 'message' => 'Timetable published to students!']);
     } else {

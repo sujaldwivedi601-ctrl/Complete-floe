@@ -33,7 +33,13 @@
     </style>
 </head>
 
-<body class="bg-slate-50 text-slate-800 min-h-screen">
+    <body class="bg-slate-50 text-slate-800 min-h-screen">
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            insertNav('Student');
+            setActiveNav('goals.html');
+        });
+    </script>
     <!-- Navigation Bar -->
     <header class="h-16 bg-white/80 backdrop-blur-md sticky top-0 z-50 w-full border-b border-slate-200">
         <div class="flex justify-between items-center w-full px-6 py-4 max-w-7xl mx-auto h-full">
@@ -176,7 +182,7 @@
 
         window.loadGoal = async function() {
             try {
-                const res = await fetch('../PHP/get_goal.php');
+                const res = await fetch('../PHP/get_goal.php', { credentials: 'same-origin' });
                 const data = await res.json();
                 
                 if (data.success && data.goal) {
@@ -205,7 +211,8 @@
                 const res = await fetch('../PHP/save_goal.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ goal: text })
+                    body: JSON.stringify({ goal: text }),
+                    credentials: 'same-origin'
                 });
                 const data = await res.json();
 
@@ -245,7 +252,7 @@
             empty.classList.add('hidden');
 
             try {
-                const res = await fetch('../PHP/ai_suggest.php');
+                const res = await fetch('../PHP/ai_suggest.php', { credentials: 'same-origin' });
                 const data = await res.json();
 
                 loading.classList.add('hidden');
@@ -277,7 +284,8 @@
     </script>
     <script>
         document.getElementById('logoutBtn').addEventListener('click', () => {
-            window.location.href = '../PHP/logout.php';
+            fetch('../PHP/logout.php', { method: 'POST', credentials: 'same-origin' })
+                .then(() => window.location.href = '../login.html');
         });
     </script>
 </body>

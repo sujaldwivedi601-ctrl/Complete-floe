@@ -431,7 +431,8 @@
     </script>
     <script>
         document.getElementById('logoutBtn').addEventListener('click', () => {
-            window.location.href = '../PHP/logout.php';
+            fetch('../PHP/logout.php', { method: 'POST', credentials: 'same-origin' })
+                .then(() => window.location.href = '../login.html');
         });
     </script>
 </body>

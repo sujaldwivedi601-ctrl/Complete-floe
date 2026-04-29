@@ -25,7 +25,7 @@ $timetable_data = json_encode($data['timetable_data']);
 
 $stmt = mysqli_prepare($conn, "INSERT INTO timetables (user_id, college_id, title, type, is_public, timetable_data) VALUES (?, ?, ?, ?, ?, ?)");
 if ($stmt) {
-    mysqli_stmt_bind_param($stmt, "iissis", $user_id, $college_id, $title, $type, $is_public, $timetable_data);
+    mysqli_stmt_bind_param($stmt, "iisssi", $user_id, $college_id, $title, $type, $is_public, $timetable_data);
     if (mysqli_stmt_execute($stmt)) {
         $timetable_id = mysqli_insert_id($conn);
         echo json_encode(['success' => true, 'message' => 'Timetable saved successfully', 'timetable_id' => $timetable_id]);

@@ -50,7 +50,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             mysqli_stmt_close($stmt);
             
             // Start session and log them in
-            session_start();
+            if (session_status() === PHP_SESSION_NONE) {
+                session_start();
+            }
             $_SESSION['id'] = $new_user_id;
             $_SESSION['user_name'] = $user_name;
             $_SESSION['email'] = $email;
