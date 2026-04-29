@@ -18,7 +18,7 @@ $response = [
 ];
 
 // 1. Get teacher-assigned tasks (HIGH priority - cannot delete)
-$stmt = mysqli_prepare($conn, "SELECT id, task_name as title, subject, planned_time, status FROM tasks WHERE student_id = ? AND (status = 'pending' OR status = 'completed') ORDER BY status ASC, created_at DESC");
+$stmt = mysqli_prepare($conn, "SELECT id, title, subject, planned_time, status FROM tasks WHERE student_id = ? AND (status = 'pending' OR status = 'done') ORDER BY status ASC, created_at DESC");
 mysqli_stmt_bind_param($stmt, "i", $user_id);
 mysqli_stmt_execute($stmt);
 $result = mysqli_stmt_get_result($stmt);

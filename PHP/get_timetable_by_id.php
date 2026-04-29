@@ -11,15 +11,16 @@ if (!isset($_SESSION['id'])) {
 
 $user_id = $_SESSION['id'];
 $timetable_id = $_GET['id'] ?? null;
+$college_id = $_SESSION['college_id'] ?? 0;
 
 if (!$timetable_id) {
     echo json_encode(['success' => false, 'error' => 'ID is required']);
     exit();
 }
 
-$stmt = mysqli_prepare($conn, "SELECT id, title, type, timetable_data, created_at FROM timetables WHERE id = ? AND user_id = ?");
+$stmt = mysqli_prepare($conn, "SELECT id, title, type, timetable_data, created_at FROM timetables WHERE id = ? AND (user_id = ? OR (is_public = 1 AND college_id = ?))");
 if ($stmt) {
-    mysqli_stmt_bind_param($stmt, "ii", $timetable_id, $user_id);
+    mysqli_stmt_bind_param($stmt, "iii", $timetable_id, $user_id, $college_id);
     mysqli_stmt_execute($stmt);
     $result = mysqli_stmt_get_result($stmt);
     

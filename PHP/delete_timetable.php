@@ -13,12 +13,17 @@ $user_id = $_SESSION['id'];
 $data = json_decode(file_get_contents('php://input'), true);
 $timetable_id = $data['id'] ?? null;
 
+if ($_SESSION['role'] === 'Student') {
+    echo json_encode(['success' => false, 'error' => 'Students cannot delete timetables']);
+    exit();
+}
+
 if (!$timetable_id) {
     echo json_encode(['success' => false, 'error' => 'ID is required']);
     exit();
 }
 
-$stmt = mysqli_prepare($conn, "DELETE FROM timetables WHERE id = ? AND user_id = ?");
+$stmt = mysqli_prepare($conn, "DELETE FROM timetables WHERE id = ? AND user_id = ? AND is_public = 0");
 if ($stmt) {
     mysqli_stmt_bind_param($stmt, "ii", $timetable_id, $user_id);
     if (mysqli_stmt_execute($stmt)) {

@@ -15,6 +15,7 @@ CREATE TABLE IF NOT EXISTS user_accounts (
     role ENUM('Student', 'Teacher', 'Admin') DEFAULT 'Student',
     institution VARCHAR(150),
     college_id INT,
+    semester INT DEFAULT 1,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -58,7 +59,7 @@ CREATE TABLE IF NOT EXISTS tasks (
     title VARCHAR(255) NOT NULL,
     description TEXT,
     due_date DATE,
-    status ENUM('pending', 'done') DEFAULT 'pending',
+    status ENUM('pending', 'done', 'completed') DEFAULT 'pending',
     completed_at TIMESTAMP NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (teacher_id) REFERENCES user_accounts(id) ON DELETE CASCADE,
@@ -121,3 +122,18 @@ CREATE INDEX idx_tasks_student ON tasks(student_id);
 CREATE INDEX idx_tasks_college ON tasks(college_id);
 CREATE INDEX idx_colleges_code ON colleges(code);
 CREATE INDEX idx_user_college_id ON user_accounts(college_id);
+
+-- Table 10: Student Tasks (Student-created tasks)
+CREATE TABLE IF NOT EXISTS student_tasks (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    subject VARCHAR(100),
+    planned_time FLOAT,
+    status ENUM('pending', 'done') DEFAULT 'pending',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES user_accounts(id) ON DELETE CASCADE
+);
+
+-- Migration: Add semester column if not exists
+ALTER TABLE user_accounts ADD COLUMN IF NOT EXISTS semester INT DEFAULT 1;

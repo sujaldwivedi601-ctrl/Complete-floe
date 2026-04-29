@@ -570,6 +570,12 @@
         };
 
         window.deleteBlock = function(slot) {
+            const dayBlocks = personalBlocks[selectedDay] || {};
+            const block = dayBlocks[slot];
+            if (!block || block.source !== 'custom') {
+                alert('Cannot delete a college timetable slot.');
+                return;
+            }
             if (confirm(`Delete this block at ${slot}?`)) {
                 delete personalBlocks[selectedDay][slot];
                 renderPersonalTable();

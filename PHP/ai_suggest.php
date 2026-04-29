@@ -22,7 +22,7 @@ if (!$api_key) {
 
 // --- 1. Get user's goal ---
 $goal_stmt = mysqli_prepare($conn, "SELECT goal_text FROM goals WHERE user_id = ?");
-mysqli_stmt_bind_param($stmt, "i", $user_id);
+mysqli_stmt_bind_param($goal_stmt, "i", $user_id);
 mysqli_stmt_execute($goal_stmt);
 $goal_result = mysqli_stmt_get_result($goal_stmt);
 $goal_row = mysqli_fetch_assoc($goal_result);
@@ -31,7 +31,7 @@ mysqli_stmt_close($goal_stmt);
 
 // --- 2. Get today's timetable ---
 $timetable_stmt = mysqli_prepare($conn, "SELECT timetable_data FROM timetables WHERE college_id = ? AND is_public = 1 ORDER BY created_at DESC LIMIT 1");
-mysqli_stmt_bind_param($stmt, "i", $college_id);
+mysqli_stmt_bind_param($timetable_stmt, "i", $college_id);
 mysqli_stmt_execute($timetable_stmt);
 $timetable_result = mysqli_stmt_get_result($timetable_stmt);
 $timetable_data = [];
@@ -42,7 +42,7 @@ mysqli_stmt_close($timetable_stmt);
 
 // --- 3. Get pending tasks ---
 $tasks_stmt = mysqli_prepare($conn, "SELECT subject, title, due_date, priority FROM tasks WHERE student_id = ? AND status = 'pending' ORDER BY due_date ASC LIMIT 10");
-mysqli_stmt_bind_param($stmt, "i", $user_id);
+mysqli_stmt_bind_param($tasks_stmt, "i", $user_id);
 mysqli_stmt_execute($tasks_stmt);
 $tasks_result = mysqli_stmt_get_result($tasks_stmt);
 $tasks = [];

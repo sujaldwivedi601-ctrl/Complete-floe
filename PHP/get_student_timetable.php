@@ -44,7 +44,7 @@ if ($row = mysqli_fetch_assoc($result)) {
 mysqli_stmt_close($stmt);
 
 // 3. Get pending tasks for today and upcoming
-$stmt = mysqli_prepare($conn, "SELECT id, subject, task_name, due_date, priority FROM tasks WHERE user_id = ? AND (due_date >= CURDATE() OR due_date IS NULL) ORDER BY due_date ASC LIMIT 20");
+$stmt = mysqli_prepare($conn, "SELECT id, subject, title, due_date FROM tasks WHERE student_id = ? AND (due_date >= CURDATE() OR due_date IS NULL) ORDER BY due_date ASC LIMIT 20");
 mysqli_stmt_bind_param($stmt, "i", $user_id);
 mysqli_stmt_execute($stmt);
 $result = mysqli_stmt_get_result($stmt);
