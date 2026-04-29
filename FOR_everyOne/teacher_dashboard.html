@@ -27,26 +27,28 @@
         .animate-float-delayed { animation: float 8s ease-in-out infinite 2s; }
     </style>
 </head>
+
 <body class="bg-slate-50 text-slate-800 min-h-screen relative">
+    <!-- Navigation Bar -->
+    <header class="h-16 bg-white/80 backdrop-blur-md sticky top-0 z-50 w-full border-b border-slate-200">
+        <div class="flex justify-between items-center w-full px-6 py-4 max-w-7xl mx-auto h-full">
+            <div class="text-2xl font-extrabold text-[#006ADC] flex items-center gap-2">
+                <span class="material-symbols-outlined text-blue-600 text-3xl">architecture</span>
+                Precision Architect
+            </div>
+            <nav class="hidden md:flex items-center gap-2">
+                <a class="font-semibold text-sm text-blue-700 bg-blue-50 px-4 py-2 rounded-lg" href="teacher_dashboard.html">Dashboard</a>
+                <a class="font-medium text-sm text-slate-600 px-4 py-2 rounded-lg hover:bg-slate-100" href="generate_timetable.html">Generate Timetable</a>
+                <button id="logoutBtn" class="font-medium text-sm text-slate-600 px-4 py-2 rounded-lg border border-slate-200 hover:bg-slate-100">Logout</button>
+            </nav>
+        </div>
+    </header>
+
     <!-- Decorative Background Orbs -->
     <div class="absolute top-[-10%] left-[-10%] w-96 h-96 bg-blue-400/20 rounded-full mix-blend-multiply filter blur-[80px] animate-float z-0"></div>
     <div class="absolute bottom-[-10%] right-[-5%] w-[30rem] h-[30rem] bg-indigo-400/20 rounded-full mix-blend-multiply filter blur-[100px] animate-float-delayed z-0"></div>
 
     <div class="relative z-10 w-full pb-20">
-        <!-- Header -->
-        <header class="h-20 glass-panel sticky top-0 z-50 w-full transition-all duration-300">
-            <div class="flex justify-between items-center w-full px-6 py-4 max-w-7xl mx-auto h-full">
-                <div class="text-2xl font-extrabold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent tracking-tighter flex items-center gap-2">
-                    <span class="material-symbols-outlined text-blue-600 text-3xl">architecture</span>
-                    Precision Architect
-                </div>
-                <nav class="hidden md:flex items-center gap-2">
-                    <a class="font-semibold text-sm text-blue-700 bg-blue-50/80 px-5 py-2.5 rounded-xl shadow-sm border border-blue-100/50" href="teacher_dashboard.html">Dashboard</a>
-                    <a class="font-medium text-sm text-slate-600 px-5 py-2.5 rounded-xl hover:bg-slate-100/60 hover:text-slate-900 transition-all" href="generate_timetable.html">Generate Timetable</a>
-                    <button id="logoutBtn" class="ml-4 font-semibold text-sm text-slate-700 px-6 py-2.5 rounded-xl border border-slate-200/60 hover:bg-white hover:shadow-md transition-all duration-300 cursor-pointer">Logout</button>
-                </nav>
-            </div>
-        </header>
 
         <main class="max-w-7xl mx-auto px-6 py-10 pt-12">
             <div class="space-y-12">
@@ -91,7 +93,26 @@
                     </div>
                 </div>
 
-                
+                <!-- Timetables Grid -->
+                <div class="mt-8">
+                    <div class="mb-6 flex justify-between items-center">
+                        <h2 class="text-3xl font-extrabold text-slate-900 tracking-tight">My Timetables</h2>
+                        <a href="generate_timetable.html" class="bg-[#006ADC] hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-bold flex items-center gap-2">
+                            <span class="material-symbols-outlined">add</span>
+                            Create New
+                        </a>
+                    </div>
+                    <div id="timetablesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div class="col-span-full py-16 text-center bg-white rounded-3xl border-2 border-dashed border-slate-200">
+                            <span class="material-symbols-outlined text-5xl text-slate-200 mb-4">folder_open</span>
+                            <p class="text-slate-400 font-medium text-lg">No timetables saved yet.</p>
+                            <a href="generate_timetable.html" class="mt-4 inline-flex items-center text-[#006ADC] font-bold hover:underline">
+                                Create your first one <span class="material-symbols-outlined ml-1">arrow_forward</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
 
                 <!-- Assign Task Section -->
                 <section class="mt-8">
@@ -105,21 +126,20 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
                                     <label class="block text-sm font-bold text-slate-600 mb-2">Subject</label>
-                                    <select id="taskSubject" name="subject" required class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-blue-400">
-                                        <option value="">Select Subject</option>
-                                        <option value="Mathematics">Mathematics</option>
-                                        <option value="Physics">Physics</option>
-                                        <option value="Chemistry">Chemistry</option>
-                                        <option value="Computer Science">Computer Science</option>
-                                        <option value="English">English</option>
-                                        <option value="Biology">Biology</option>
-                                    </select>
+                                    <input type="text" id="taskSubject" name="subject" required placeholder="e.g., Mathematics" 
+                                        class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-blue-400">
                                 </div>
 
                                 <div>
                                     <label class="block text-sm font-bold text-slate-600 mb-2">Assign To</label>
-                                    <select id="taskTarget" name="target" class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-blue-400">
-                                        <option value="all">Whole Class</option>
+                                    <select id="taskTarget" name="target" class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-blue-400" onchange="updateTargetOptions()">
+                                        <option value="all">All Students</option>
+                                        <option value="sem1">SEM 1 Students</option>
+                                        <option value="sem2">SEM 2 Students</option>
+                                        <option value="sem3">SEM 3 Students</option>
+                                        <option value="sem4">SEM 4 Students</option>
+                                        <option value="sem5">SEM 5 Students</option>
+                                        <option value="sem6">SEM 6 Students</option>
                                         <option value="individual">Individual Student</option>
                                     </select>
                                 </div>
@@ -194,23 +214,36 @@
     <script>
         // --- TASK ASSIGNMENT ---
         document.addEventListener('DOMContentLoaded', () => {
-            loadStudentsForTask();
+            loadAllStudents();
             loadAssignedTasks();
             
             // Toggle student dropdown
             document.getElementById('taskTarget').addEventListener('change', (e) => {
                 const studentSelect = document.getElementById('studentSelectDiv');
                 studentSelect.classList.toggle('hidden', e.target.value !== 'individual');
-            });
-
-            // Assign task form
-            document.getElementById('assignTaskForm').addEventListener('submit', (e) => {
-                e.preventDefault();
-                assignTask(new FormData(e.target));
+                
+                // Reload students when semester is selected
+                if (e.target.value.startsWith('sem')) {
+                    loadStudentsBySemester(e.target.value);
+                } else if (e.target.value === 'all') {
+                    loadAllStudents();
+                }
             });
         });
 
-async function loadStudentsForTask() {
+        window.updateTargetOptions = function() {
+            const target = document.getElementById('taskTarget').value;
+            const studentSelect = document.getElementById('studentSelectDiv');
+            
+            if (target === 'individual') {
+                studentSelect.classList.remove('hidden');
+                loadAllStudents();
+            } else {
+                studentSelect.classList.add('hidden');
+            }
+        };
+
+        async function loadAllStudents() {
             try {
                 const res = await fetch('../PHP/get_students.php');
                 const data = await res.json();
@@ -220,7 +253,26 @@ async function loadStudentsForTask() {
                 
                 if (data.students) {
                     data.students.forEach(s => {
-                        select.innerHTML += `<option value="${s.id}">${s.user_name}</option>`;
+                        select.innerHTML += `<option value="${s.id}">${s.user_name} (SEM ${s.semester || 1})</option>`;
+                    });
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        async function loadStudentsBySemester(semester) {
+            const semNum = semester.replace('sem', '');
+            try {
+                const res = await fetch(`../PHP/get_students.php?semester=${semNum}`);
+                const data = await res.json();
+                
+                const select = document.getElementById('taskStudent');
+                select.innerHTML = '<option value="">Select Student</option>';
+                
+                if (data.students) {
+                    data.students.forEach(s => {
+                        select.innerHTML += `<option value="${s.id}">${s.user_name} (SEM ${s.semester || 1})</option>`;
                     });
                 }
             } catch (err) {
@@ -229,14 +281,22 @@ async function loadStudentsForTask() {
         }
 
         window.assignTask = async function(formData) {
+            const target = formData.get('target');
             const data = {
                 subject: formData.get('subject'),
                 title: formData.get('title'),
                 description: formData.get('description'),
                 due_date: formData.get('due_date'),
-                target_all: formData.get('target') === 'all',
-                student_id: formData.get('student_id') || 0
+                semester: null,
+                student_id: null
             };
+
+            // Handle different target types
+            if (target === 'individual') {
+                data.student_id = parseInt(formData.get('student_id')) || null;
+            } else if (target.startsWith('sem')) {
+                data.semester = parseInt(target.replace('sem', ''));
+            }
 
             if (!data.subject || !data.title) {
                 alert('Please fill in subject and title');
@@ -359,6 +419,11 @@ async function loadStudentsForTask() {
             document.body.appendChild(toast);
             setTimeout(() => toast.remove(), 3000);
         }
+    </script>
+    <script>
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            window.location.href = '../PHP/logout.php';
+        });
     </script>
 </body>
 </html>

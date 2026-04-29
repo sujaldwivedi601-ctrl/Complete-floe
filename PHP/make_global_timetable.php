@@ -16,7 +16,7 @@ if (!$data || !isset($data['id'])) {
     exit();
 }
 
-$timetable_id = $data['id'];
+$timetable_id = intval($data['id']);
 $user_id = $_SESSION['id'];
 $college_id = $_SESSION['college_id'] ?? null;
 
@@ -39,7 +39,7 @@ if ($stmt) {
     }
     mysqli_stmt_close($stmt);
 } else {
-    echo json_encode(['success' => false, 'error' => 'Database error']);
+    echo json_encode(['success' => false, 'error' => 'Database error: ' . mysqli_error($conn)]);
 }
 
 mysqli_close($conn);

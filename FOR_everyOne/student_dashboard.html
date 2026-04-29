@@ -7,6 +7,7 @@
     <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <script src="nav.js"></script>
     <style>
         body { font-family: 'Inter', sans-serif; }
         .tab-active { border-bottom: 2px solid #006ADC; color: #006ADC; }
@@ -17,16 +18,18 @@
         .custom-row { background: #ecfdf5; }
     </style>
 </head>
+
 <body class="bg-slate-50 text-slate-800 min-h-screen">
+    <!-- Navigation Bar -->
     <header class="h-16 bg-white/80 backdrop-blur-md sticky top-0 z-50 w-full border-b border-slate-200">
         <div class="flex justify-between items-center w-full px-6 py-4 max-w-7xl mx-auto h-full">
             <div class="text-2xl font-extrabold text-[#006ADC] flex items-center gap-2">
                 <span class="material-symbols-outlined text-blue-600 text-3xl">architecture</span>
                 Precision Architect
             </div>
-            <nav class="hidden md:flex items-center gap-4">
+            <nav class="hidden md:flex items-center gap-2">
                 <a class="font-medium text-sm text-slate-600 px-4 py-2 rounded-lg hover:bg-slate-100" href="index.html">Home</a>
-                <a class="font-medium text-sm text-blue-700 bg-blue-50 px-4 py-2 rounded-lg" href="student_dashboard.html">My Timetable</a>
+                <a class="font-semibold text-sm text-blue-700 bg-blue-50 px-4 py-2 rounded-lg" href="student_dashboard.html">My Timetable</a>
                 <a class="font-medium text-sm text-slate-600 px-4 py-2 rounded-lg hover:bg-slate-100" href="goals.html">Goals</a>
                 <button id="logoutBtn" class="font-medium text-sm text-slate-600 px-4 py-2 rounded-lg border border-slate-200 hover:bg-slate-100">Logout</button>
             </nav>
@@ -271,17 +274,12 @@
 
         // --- INITIALIZATION ---
         document.addEventListener('DOMContentLoaded', () => {
+            insertNav('Student');
+            setActiveNav('student_dashboard.html');
             loadData();
             selectDay('Monday');
             populateTimeSelect();
-            setupLogout();
         });
-
-        function setupLogout() {
-            document.getElementById('logoutBtn').addEventListener('click', () => {
-                window.location.href = '../PHP/logout.php';
-            });
-        }
 
         function populateTimeSelect() {
             const select = document.getElementById('customTime');
@@ -294,13 +292,45 @@
         }
 
         // --- DATA LOADING ---
+        let userSemester = 1; // Default to SEM1
+        
         async function loadData() {
             try {
-                const res = await fetch('../PHP/get_student_timetable.php');
-                const data = await res.json();
-
-                collegeTimetable = data.college_timetable;
-                personalBlocks = data.custom_blocks || {};
+                // Get user details first to know their semester
+                const userRes = await fetch('../PHP/get_user_details.php', { credentials: 'same-origin' });
+                const userData = await userRes.json();
+                
+                // Try to get semester from user data (you may need to add a semester field to users)
+                if (userData.semester) {
+                    userSemester = parseInt(userData.semester);
+                }
+                
+                // Load college timetables for the student's college
+                const collegeRes = await fetch('../PHP/get_college_timetable.php', { credentials: 'same-origin' });
+                const collegeData = await collegeRes.json();
+                
+                if (collegeData.success && collegeData.timetables && collegeData.timetables.length > 0) {
+                    // Find timetable for this student's semester
+                    let matchedTimetable = null;
+                    
+                    for (let t of collegeData.timetables) {
+                        const sems = t.timetable_data?.activeSems || [];
+                        if (sems.includes(userSemester)) {
+                            matchedTimetable = t;
+                            break;
+                        }
+                    }
+                    
+                    // If no matching semester, use the first available
+                    collegeTimetable = matchedTimetable || collegeData.timetables[0];
+                } else {
+                    collegeTimetable = null;
+                }
+                
+                // Load personal timetable
+                const personalRes = await fetch('../PHP/get_student_timetable.php', { credentials: 'same-origin' });
+                const personalData = await personalRes.json();
+                personalBlocks = personalData.custom_blocks || {};
 
                 // Ensure structure
                 days.forEach(day => {
@@ -568,7 +598,7 @@
         // --- SAVE ---
         window.savePersonalTimetable = async function() {
             try {
-                const res = await fetch('../PHP/save_student_timetable.php', {
+                const res = await fetch('../PHP/save_student_timetable.php', { credentials: 'same-origin',
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ custom_blocks: personalBlocks })
@@ -600,7 +630,7 @@
         // Load tasks
         async function loadTasks() {
             try {
-                const res = await fetch('../PHP/get_student_tasks.php');
+                const res = await fetch('../PHP/get_student_tasks.php', { credentials: 'same-origin' });
                 const data = await res.json();
 
                 teacherTasks = data.teacher_tasks || [];
@@ -733,7 +763,7 @@
             }
 
             try {
-                const res = await fetch('../PHP/add_student_task.php', {
+                const res = await fetch('../PHP/add_student_task.php', { credentials: 'same-origin',
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ title, subject, planned_time })
@@ -756,7 +786,7 @@
             if (!confirm('Delete this task?')) return;
 
             try {
-                const res = await fetch('../PHP/delete_student_task.php', {
+                const res = await fetch('../PHP/delete_student_task.php', { credentials: 'same-origin',
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ id })
@@ -801,7 +831,7 @@
 
             // Generate questions with AI
             try {
-                const res = await fetch('../PHP/generate_quiz.php', {
+                const res = await fetch('../PHP/generate_quiz.php', { credentials: 'same-origin',
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -855,7 +885,7 @@
             document.getElementById('quizActionBtn').disabled = true;
 
             try {
-                const res = await fetch('../PHP/check_quiz.php', {
+                const res = await fetch('../PHP/check_quiz.php', { credentials: 'same-origin',
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -879,7 +909,7 @@
                     document.getElementById('resultText').textContent = 'PASS! Great job!';
                     document.getElementById('resultText').className = 'text-xl font-bold text-green-600';
 
-                    await fetch('../PHP/complete_task.php', {
+                    await fetch('../PHP/complete_task.php', { credentials: 'same-origin',
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ task_id: currentQuizTask.id })
@@ -908,6 +938,11 @@
 
         // Load tasks on init
         loadTasks();
+    </script>
+    <script>
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            window.location.href = '../PHP/logout.php';
+        });
     </script>
 </body>
 </html>

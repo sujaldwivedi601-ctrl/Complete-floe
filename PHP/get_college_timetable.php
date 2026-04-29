@@ -16,14 +16,20 @@ if (!$college_id) {
     exit();
 }
 
-$stmt = mysqli_prepare($conn, "SELECT id, title, type, timetable_data, created_at FROM timetables WHERE college_id = ? AND is_public = 1 ORDER BY created_at DESC LIMIT 1");
+// Get ALL public timetables for the college (each semester may have its own)
+$stmt = mysqli_prepare($conn, "SELECT id, title, type, timetable_data, created_at FROM timetables WHERE college_id = ? AND is_public = 1 ORDER BY created_at DESC");
 mysqli_stmt_bind_param($stmt, "i", $college_id);
 mysqli_stmt_execute($stmt);
 $result = mysqli_stmt_get_result($stmt);
 
-if ($timetable = mysqli_fetch_assoc($result)) {
-    $timetable['timetable_data'] = json_decode($timetable['timetable_data'], true);
-    echo json_encode(['success' => true, 'timetable' => $timetable]);
+$timetables = [];
+while ($row = mysqli_fetch_assoc($result)) {
+    $row['timetable_data'] = json_decode($row['timetable_data'], true);
+    $timetables[] = $row;
+}
+
+if (count($timetables) > 0) {
+    echo json_encode(['success' => true, 'timetables' => $timetables]);
 } else {
     echo json_encode(['success' => false, 'error' => 'No published timetable found']);
 }

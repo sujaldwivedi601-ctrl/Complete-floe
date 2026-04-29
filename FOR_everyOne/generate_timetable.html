@@ -27,23 +27,9 @@
   </style>
 </head>
 
-<body class="bg-slate-50 text-slate-800 min-h-screen relative">
+<body class="bg-slate-50 text-slate-800 min-h-screen relative" onload="insertNav('Teacher'); setActiveNav('generate_timetable.html')">
   <div class="absolute top-[-10%] left-[-10%] w-96 h-96 bg-blue-400/20 rounded-full mix-blend-multiply filter blur-[80px] animate-float z-0"></div>
   <div class="absolute bottom-[-10%] right-[-5%] w-[30rem] h-[30rem] bg-indigo-400/20 rounded-full mix-blend-multiply filter blur-[100px] animate-float-delayed z-0"></div>
-
-  <header class="h-20 glass-panel sticky top-0 z-50 w-full transition-all duration-300">
-    <div class="flex justify-between items-center w-full px-6 py-4 max-w-7xl mx-auto h-full">
-      <div class="text-2xl font-extrabold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent tracking-tighter flex items-center gap-2">
-        <span class="material-symbols-outlined text-blue-600 text-3xl">architecture</span>
-        Precision Architect
-      </div>
-      <nav class="hidden md:flex items-center gap-2">
-        <a class="font-medium text-sm text-slate-600 px-5 py-2.5 rounded-xl hover:bg-slate-100/60 hover:text-slate-900 transition-all" href="teacher_dashboard.html">Dashboard</a>
-        <a class="font-semibold text-sm text-blue-700 bg-blue-50/80 px-5 py-2.5 rounded-xl shadow-sm border border-blue-100/50" href="generate_timetable.html">Generate Timetable</a>
-        <button id="logoutBtn" class="ml-4 font-semibold text-sm text-slate-700 px-6 py-2.5 rounded-xl border border-slate-200/60 hover:bg-white hover:shadow-md transition-all duration-300 cursor-pointer">Logout</button>
-      </nav>
-    </div>
-  </header>
 
   <main class="relative z-10 max-w-[1440px] mx-auto p-6">
     <div class="grid grid-cols-12 gap-6">

@@ -47,10 +47,22 @@
 
             <div>
                 <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">Role</label>
-                <select id="regRole" name="role" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all bg-white">
+                <select id="regRole" name="role" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all bg-white" onchange="toggleSemester()">
                     <option value="Student">Student</option>
                     <option value="Teacher">Teacher</option>
                     <option value="Admin">Admin</option>
+                </select>
+            </div>
+
+            <div id="semesterDiv" class="hidden">
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">Semester</label>
+                <select id="regSemester" name="semester" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all bg-white">
+                    <option value="1">SEM 1</option>
+                    <option value="2">SEM 2</option>
+                    <option value="3">SEM 3</option>
+                    <option value="4">SEM 4</option>
+                    <option value="5">SEM 5</option>
+                    <option value="6">SEM 6</option>
                 </select>
             </div>
 

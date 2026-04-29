@@ -10,9 +10,22 @@ if (!isset($_SESSION['id']) || $_SESSION['role'] !== 'Teacher') {
 }
 
 $college_id = $_SESSION['college_id'] ?? 0;
+$semester = $_GET['semester'] ?? null;
 
-$stmt = mysqli_prepare($conn, "SELECT id, user_name, email FROM user_accounts WHERE role = 'Student' AND college_id = ? ORDER BY user_name");
-mysqli_stmt_bind_param($stmt, "i", $college_id);
+$sql = "SELECT id, user_name, email, semester FROM user_accounts WHERE role = 'Student' AND college_id = ?";
+$params = [$college_id];
+$types = "i";
+
+if ($semester) {
+    $sql .= " AND semester = ?";
+    $params[] = $semester;
+    $types .= "i";
+}
+
+$sql .= " ORDER BY user_name";
+
+$stmt = mysqli_prepare($conn, $sql);
+mysqli_stmt_bind_param($stmt, $types, ...$params);
 mysqli_stmt_execute($stmt);
 $result = mysqli_stmt_get_result($stmt);
 

@@ -33,17 +33,41 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $role = $_POST['role'] ?? '';
     $institution = $_POST['institution'] ?? '';
     $institution_code = $_POST['institution_code'] ?? '';
+    $semester = $_POST['semester'] ?? 1;
     
     $college_id = saveCollege($conn, $institution, $institution_code);
     
-    $stmt = mysqli_prepare($conn, "INSERT INTO user_accounts (user_name, email, password, number, role, institution, college_id) VALUES (?, ?, ?, ?, ?, ?, ?)");
+    // Normalize role for database
+    $roleNormalized = ucfirst(strtolower($role)); // 'student' -> 'Student'
+    
+    $stmt = mysqli_prepare($conn, "INSERT INTO user_accounts (user_name, email, password, number, role, institution, college_id, semester) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
     
     if ($stmt) {
-        mysqli_stmt_bind_param($stmt, "ssssssi", $user_name, $email, $password, $number, $role, $institution, $college_id);
+        mysqli_stmt_bind_param($stmt, "ssssssii", $user_name, $email, $password, $number, $roleNormalized, $institution, $college_id, $semester);
         
         if (mysqli_stmt_execute($stmt)) {
+            $new_user_id = mysqli_insert_id($conn);
             mysqli_stmt_close($stmt);
-            header("Location: ../FOR_everyOne/login.html");
+            
+            // Start session and log them in
+            session_start();
+            $_SESSION['id'] = $new_user_id;
+            $_SESSION['user_name'] = $user_name;
+            $_SESSION['email'] = $email;
+            $_SESSION['role'] = $roleNormalized;
+            $_SESSION['college_id'] = $college_id;
+            if ($roleNormalized === 'Student') {
+                $_SESSION['semester'] = $semester;
+            }
+            
+            // Redirect based on role
+            if ($roleNormalized === 'Teacher') {
+                header("Location: ../FOR_everyOne/teacher_dashboard.html");
+            } elseif ($roleNormalized === 'Student') {
+                header("Location: ../FOR_everyOne/student_dashboard.html");
+            } else {
+                header("Location: ../FOR_everyOne/index.html");
+            }
             exit();
         } else {
             die("Execution Error: " . mysqli_stmt_error($stmt));

@@ -9,6 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1;display=swap"
         rel="stylesheet" />
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="nav.js"></script>
     <script id="tailwind-config">
         tailwind.config = {
             darkMode: "class",
@@ -40,20 +41,18 @@
 </head>
 
 <body class="font-body min-h-screen flex flex-col">
+    <!-- Navigation Bar -->
     <header class="h-16 bg-white/80 backdrop-blur-md sticky top-0 z-10 w-full border-b border-slate-200">
         <div class="flex justify-between items-center w-full px-5 py-3 max-w-7xl mx-auto">
-            <div class="text-xl font-extrabold text-[#006ADC] tracking-tighter font-headline">
+            <div class="text-xl font-extrabold text-[#006ADC] tracking-tighter font-headline flex items-center gap-2">
+                <span class="material-symbols-outlined text-blue-600">architecture</span>
                 Precision Architect
             </div>
-            <nav class="hidden md:flex items-center gap-4">
-                <a class="font-['Manrope'] font-bold text-sm text-slate-600 px-4 py-2 rounded-lg hover:bg-blue-50 hover:text-[#006ADC] transition-all"
-                    href="index.html">Home</a>
-                <a class="font-['Manrope'] font-bold text-sm text-[#006ADC] bg-blue-50 px-4 py-2 rounded-lg border-b-2 border-[#006ADC]"
-                    href="personal_Timetable.html">Personal Timetable</a>
-                <button id="logoutBtn"
-                    class="ml-4 font-['Manrope'] font-bold text-sm text-slate-600 px-5 py-2 rounded-lg border border-slate-200 hover:bg-slate-100">
-                    Logout
-                </button>
+            <nav class="hidden md:flex items-center gap-2">
+                <a class="font-['Manrope'] font-bold text-sm text-slate-600 px-4 py-2 rounded-lg hover:bg-blue-50" href="index.html">Home</a>
+                <a class="font-['Manrope'] font-bold text-sm text-blue-700 bg-blue-50 px-4 py-2 rounded-lg" href="personal_Timetable.html">My Timetable</a>
+                <a class="font-['Manrope'] font-bold text-sm text-slate-600 px-4 py-2 rounded-lg hover:bg-blue-50" href="goals.html">Goals</a>
+                <button id="logoutBtn" class="font-['Manrope'] font-bold text-sm text-slate-600 px-4 py-2 rounded-lg border border-slate-200 hover:bg-slate-100">Logout</button>
             </nav>
         </div>
     </header>
@@ -204,7 +203,7 @@
         // --- DATA LOADING ---
         async function loadPersonalTimetable() {
             try {
-                const res = await fetch('../PHP/get_student_timetable.php');
+                const res = await fetch('../PHP/get_student_timetable.php', { credentials: 'same-origin' });
                 const data = await res.json();
 
                 document.getElementById('timetableLoader').classList.add('hidden');
@@ -386,7 +385,7 @@
         // --- SAVE ---
         window.savePersonalTimetable = async function() {
             try {
-                const res = await fetch('../PHP/save_student_timetable.php', {
+                const res = await fetch('../PHP/save_student_timetable.php', { credentials: 'same-origin',
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ custom_blocks: customBlocks })
@@ -429,6 +428,11 @@
                 </div>
             `).join('');
         }
+    </script>
+    <script>
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            window.location.href = '../PHP/logout.php';
+        });
     </script>
 </body>
 

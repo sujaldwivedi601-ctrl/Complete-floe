@@ -7,6 +7,7 @@
     <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <script src="nav.js"></script>
     <style>
         body { font-family: 'Inter', sans-serif; }
         .glass-panel {
@@ -31,18 +32,20 @@
         }
     </style>
 </head>
+
 <body class="bg-slate-50 text-slate-800 min-h-screen">
-    <header class="h-20 glass-panel sticky top-0 z-50 w-full">
+    <!-- Navigation Bar -->
+    <header class="h-16 bg-white/80 backdrop-blur-md sticky top-0 z-50 w-full border-b border-slate-200">
         <div class="flex justify-between items-center w-full px-6 py-4 max-w-7xl mx-auto h-full">
-            <div class="text-2xl font-extrabold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent tracking-tighter flex items-center gap-2">
+            <div class="text-2xl font-extrabold text-[#006ADC] flex items-center gap-2">
                 <span class="material-symbols-outlined text-blue-600 text-3xl">architecture</span>
                 Precision Architect
             </div>
             <nav class="hidden md:flex items-center gap-2">
                 <a class="font-medium text-sm text-slate-600 px-4 py-2 rounded-lg hover:bg-slate-100" href="index.html">Home</a>
-                <a class="font-medium text-sm text-slate-600 px-4 py-2 rounded-lg hover:bg-slate-100" href="personal_Timetable.html">My Timetable</a>
-                <a class="font-semibold text-sm text-blue-700 bg-blue-50 px-4 py-2 rounded-lg border-b-2 border-blue-600" href="goals.html">Goals</a>
-                <button id="logoutBtn" class="ml-4 font-medium text-sm text-slate-600 px-4 py-2 rounded-lg border border-slate-200 hover:bg-slate-100">Logout</button>
+                <a class="font-medium text-sm text-slate-600 px-4 py-2 rounded-lg hover:bg-slate-100" href="student_dashboard.html">My Timetable</a>
+                <a class="font-semibold text-sm text-blue-700 bg-blue-50 px-4 py-2 rounded-lg" href="goals.html">Goals</a>
+                <button id="logoutBtn" class="font-medium text-sm text-slate-600 px-4 py-2 rounded-lg border border-slate-200 hover:bg-slate-100">Logout</button>
             </nav>
         </div>
     </header>
@@ -271,6 +274,11 @@
             document.body.appendChild(toast);
             setTimeout(() => toast.remove(), 3000);
         }
+    </script>
+    <script>
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            window.location.href = '../PHP/logout.php';
+        });
     </script>
 </body>
 </html>

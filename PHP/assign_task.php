@@ -23,8 +23,8 @@ $subject = $data['subject'] ?? '';
 $title = $data['title'] ?? '';
 $description = $data['description'] ?? '';
 $due_date = $data['due_date'] ?? null;
-$student_id = $data['student_id'] ?? 0;
-$target_all = $data['target_all'] ?? false;
+$student_id = $data['student_id'] ?? null;
+$semester = $data['semester'] ?? null;
 
 // Validate
 if (!$title || !$subject) {
@@ -34,8 +34,47 @@ if (!$title || !$subject) {
 
 $inserted = 0;
 
-if ($target_all || $student_id === 'all') {
-    // Get all students in the teacher's college
+// Determine which students to assign to
+if ($student_id) {
+    // Individual student - only one task
+    $student_id = intval($student_id);
+    $stmt = mysqli_prepare($conn, "
+        INSERT INTO tasks (teacher_id, student_id, college_id, subject, title, description, due_date) 
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+    ");
+    mysqli_stmt_bind_param($stmt, "iiissss", $teacher_id, $student_id, $college_id, $subject, $title, $description, $due_date);
+    
+    if (mysqli_stmt_execute($stmt)) {
+        $inserted = 1;
+    } else {
+        echo json_encode(['success' => false, 'error' => mysqli_stmt_error($stmt)]);
+        exit();
+    }
+    mysqli_stmt_close($stmt);
+    
+} elseif ($semester) {
+    // Specific semester - assign to all students in that semester
+    $semester = intval($semester);
+    $stmt = mysqli_prepare($conn, "SELECT id FROM user_accounts WHERE role = 'Student' AND college_id = ? AND semester = ?");
+    mysqli_stmt_bind_param($stmt, "ii", $college_id, $semester);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+
+    $insertStmt = mysqli_prepare($conn, "
+        INSERT INTO tasks (teacher_id, student_id, college_id, subject, title, description, due_date) 
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+    ");
+
+    while ($student = mysqli_fetch_assoc($result)) {
+        mysqli_stmt_bind_param($insertStmt, "iiissss", $teacher_id, $student['id'], $college_id, $subject, $title, $description, $due_date);
+        mysqli_stmt_execute($insertStmt);
+        $inserted++;
+    }
+    mysqli_stmt_close($stmt);
+    mysqli_stmt_close($insertStmt);
+    
+} else {
+    // All students in the college
     $stmt = mysqli_prepare($conn, "SELECT id FROM user_accounts WHERE role = 'Student' AND college_id = ?");
     mysqli_stmt_bind_param($stmt, "i", $college_id);
     mysqli_stmt_execute($stmt);
@@ -53,25 +92,10 @@ if ($target_all || $student_id === 'all') {
     }
     mysqli_stmt_close($stmt);
     mysqli_stmt_close($insertStmt);
-} else {
-    // Single student
-    $student_id = intval($student_id);
-    $stmt = mysqli_prepare($conn, "
-        INSERT INTO tasks (teacher_id, student_id, college_id, subject, title, description, due_date) 
-        VALUES (?, ?, ?, ?, ?, ?, ?)
-    ");
-    mysqli_stmt_bind_param($stmt, "iiissss", $teacher_id, $student_id, $college_id, $subject, $title, $description, $due_date);
-    
-    if (mysqli_stmt_execute($stmt)) {
-        $inserted = 1;
-    } else {
-        echo json_encode(['success' => false, 'error' => mysqli_stmt_error($stmt)]);
-        exit();
-    }
-    mysqli_stmt_close($stmt);
 }
 
-echo json_encode(['success' => true, 'message' => "Task assigned to $inserted student(s)", 'count' => $inserted]);
+$message = $inserted === 1 ? "Task assigned to 1 student" : "Task assigned to $inserted students";
+echo json_encode(['success' => true, 'message' => $message, 'count' => $inserted]);
 
 mysqli_close($conn);
 ?>

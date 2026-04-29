@@ -1,12 +1,25 @@
 document.addEventListener('DOMContentLoaded', () => {
     // 1. Fetch user data from the PHP backend
-    fetch('../PHP/get_user_details.php')
+    fetch('../PHP/get_user_details.php', { credentials: 'same-origin' })
         .then(response => response.json())
         .then(data => {
             if (data.error) {
                 // If there's an error (e.g., not logged in), redirect to login
                 console.error('Session error:', data.error);
-                window.location.href = 'login.html';
+                window.location.href = 'index.html';
+                return;
+            }
+            
+            // Validate Role vs Page
+            const isTeacherPage = window.location.pathname.includes('teacher_dashboard.html');
+            const isStudentPage = window.location.pathname.includes('student_dashboard.html');
+            
+            if (isTeacherPage && data.role !== 'Teacher' && data.role !== 'Admin') {
+                window.location.href = 'student_dashboard.html';
+                return;
+            }
+            if (isStudentPage && data.role !== 'Student' && data.role !== 'Admin') {
+                window.location.href = 'teacher_dashboard.html';
                 return;
             }
 
@@ -29,20 +42,24 @@ document.addEventListener('DOMContentLoaded', () => {
     const logoutBtn = document.getElementById('logoutBtn');
     if (logoutBtn) {
         logoutBtn.addEventListener('click', () => {
-            fetch('../PHP/logout.php', { method: 'POST' })
+            fetch('../PHP/logout.php', { method: 'POST', credentials: 'same-origin' })
                 .then(() => window.location.href = 'login.html');
         });
     }
 });
 
 function updateDashboardUI(user) {
-    if (user.user_name) {
-        document.getElementById('profileName').textContent = user.user_name;
-        document.getElementById('userInitial').textContent = user.user_name.charAt(0).toUpperCase();
-    }
-    document.getElementById('profileEmail').textContent = user.email || "N/A";
-    document.getElementById('profileRole').textContent = user.role || "User";
-    document.getElementById('profileInst').textContent = user.institution || "Not Specified";
+    const nameEl = document.getElementById('profileName');
+    const initEl = document.getElementById('userInitial');
+    const emailEl = document.getElementById('profileEmail');
+    const roleEl = document.getElementById('profileRole');
+    const instEl = document.getElementById('profileInst');
+    
+    if (nameEl) nameEl.textContent = user.user_name || "User";
+    if (initEl) initEl.textContent = user.user_name ? user.user_name.charAt(0).toUpperCase() : "U";
+    if (emailEl) emailEl.textContent = user.email || "N/A";
+    if (roleEl) roleEl.textContent = user.role || "User";
+    if (instEl) instEl.textContent = user.institution || "Not Specified";
 
     // Show college timetable for students
     const role = (user.role || '').toLowerCase();
@@ -58,19 +75,20 @@ function updateDashboardUI(user) {
 }
 
 function fetchTimetables() {
-    fetch('../PHP/get_timetables.php')
+    const grid = document.getElementById('timetablesGrid');
+    fetch('../PHP/get_timetables.php', { credentials: 'same-origin' })
         .then(res => res.json())
         .then(data => {
             if (data.success) {
                 renderTimetables(data.timetables);
             } else {
                 console.error("Failed to load timetables:", data.error);
-                document.getElementById('timetablesGrid').innerHTML = `<p class="col-span-full text-center text-red-500">${data.error}</p>`;
+                if (grid) grid.innerHTML = `<p class="col-span-full text-center text-red-500">${data.error}</p>`;
             }
         })
         .catch(err => {
             console.error(err);
-            document.getElementById('timetablesGrid').innerHTML = `<p class="col-span-full text-center text-red-500">Failed to fetch timetables.</p>`;
+            if (grid) grid.innerHTML = `<p class="col-span-full text-center text-red-500">Failed to fetch timetables.</p>`;
         });
 }
 
@@ -79,8 +97,10 @@ function renderTimetables(list) {
     const countLabel = document.getElementById('timetableCount');
     const statTotal = document.getElementById('statTotal');
 
-    countLabel.textContent = `${list.length} total`;
-    statTotal.textContent = list.length;
+    if (countLabel) countLabel.textContent = `${list.length} total`;
+    if (statTotal) statTotal.textContent = list.length;
+
+    if (!grid) return;
 
     if (list.length === 0) {
         grid.innerHTML = `
@@ -103,9 +123,9 @@ function renderTimetables(list) {
                 </div>
                 <div class="flex gap-1">
                     ${item.is_public == 1 ? '<span class="p-2 text-green-500" title="Global"><span class="material-symbols-outlined text-xl">public</span></span>' : ''}
-                    <button onclick="makeGlobal(${item.id})" class="p-2 text-slate-300 hover:text-green-500 transition-colors" title="Make Global">
+                    ${item.is_public != 1 ? `<button onclick="makeGlobal(${item.id})" class="p-2 text-slate-300 hover:text-green-500 transition-colors" title="Make Global">
                         <span class="material-symbols-outlined text-xl">public</span>
-                    </button>
+                    </button>` : ''}
                     <button onclick="deleteTimetable(${item.id})" class="p-2 text-slate-300 hover:text-red-500 transition-colors">
                         <span class="material-symbols-outlined text-xl">delete</span>
                     </button>
@@ -117,9 +137,11 @@ function renderTimetables(list) {
 
             <div class="flex items-center justify-between pt-4 border-t border-slate-50">
                 <span class="text-[10px] text-slate-400 font-medium">${new Date(item.created_at).toLocaleDateString()}</span>
-                <a href="view_timetable.html?id=${item.id}" class="flex items-center gap-1 text-sm font-bold text-[#006ADC] group-hover:gap-2 transition-all">
-                    View Full <span class="material-symbols-outlined text-sm">open_in_new</span>
-                </a>
+                <div class="flex items-center gap-2">
+                    <a href="view_timetable.html?id=${item.id}" class="flex items-center gap-1 text-sm font-bold text-[#006ADC] group-hover:gap-2 transition-all">
+                        View <span class="material-symbols-outlined text-sm">open_in_new</span>
+                    </a>
+                </div>
             </div>
         </div>
     `).join('');

@@ -22,6 +22,17 @@ async function fetchColleges() {
     }
 }
 
+window.toggleSemester = function() {
+    const role = document.getElementById('regRole').value;
+    const semesterDiv = document.getElementById('semesterDiv');
+    
+    if (role === 'Student') {
+        semesterDiv.classList.remove('hidden');
+    } else {
+        semesterDiv.classList.add('hidden');
+    }
+};
+
 document.addEventListener('DOMContentLoaded', () => {
     const instInput = document.getElementById('regInst');
     if (instInput) {

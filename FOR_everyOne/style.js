@@ -357,6 +357,8 @@ window.prepareSave = function(schedules, activeSems) {
                 window.lastTimetableId = data.timetable_id;
                 document.getElementById('publishBtn').classList.remove('hidden');
             }
+            // Redirect to dashboard to see the saved timetable
+            window.location.href = 'teacher_dashboard.html';
         } else {
             alert("Error: " + data.error);
         }
