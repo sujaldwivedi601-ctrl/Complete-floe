@@ -18,13 +18,27 @@ $response = [
 ];
 
 // 1. Get teacher-assigned tasks (HIGH priority - cannot delete)
-$stmt = mysqli_prepare($conn, "SELECT id, title, subject, planned_time, status FROM tasks WHERE student_id = ? AND (status = 'pending' OR status = 'done') ORDER BY status ASC, created_at DESC");
+// These come from the `tasks` table where a teacher assigned them to this student
+$stmt = mysqli_prepare($conn, "
+    SELECT t.id, t.title, t.subject, t.description, t.due_date, t.status, t.created_at,
+           u.user_name as teacher_name
+    FROM tasks t
+    LEFT JOIN user_accounts u ON t.teacher_id = u.id
+    WHERE t.student_id = ? 
+    ORDER BY 
+        CASE t.status WHEN 'pending' THEN 0 WHEN 'done' THEN 1 WHEN 'completed' THEN 2 END ASC,
+        t.created_at DESC
+");
 mysqli_stmt_bind_param($stmt, "i", $user_id);
 mysqli_stmt_execute($stmt);
 $result = mysqli_stmt_get_result($stmt);
 
 while ($row = mysqli_fetch_assoc($result)) {
     $row['source'] = 'teacher';
+    // Normalize status: treat 'completed' same as 'done' for display
+    if ($row['status'] === 'completed') {
+        $row['status'] = 'done';
+    }
     $response['teacher_tasks'][] = $row;
 }
 mysqli_stmt_close($stmt);

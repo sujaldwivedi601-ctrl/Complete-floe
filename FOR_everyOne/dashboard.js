@@ -1,3 +1,5 @@
+let currentUserRole = '';
+
 document.addEventListener('DOMContentLoaded', () => {
     // 1. Fetch user data from the PHP backend
     fetch('../PHP/get_user_details.php', { credentials: 'same-origin' })
@@ -6,7 +8,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (data.error) {
                 // If there's an error (e.g., not logged in), redirect to login
                 console.error('Session error:', data.error);
-                window.location.href = 'index.html';
+                const isInGPC = window.location.pathname.includes('/GPC/');
+                window.location.href = isInGPC ? '../FOR_everyOne/login.html' : 'login.html';
                 return;
             }
             
@@ -15,13 +18,17 @@ document.addEventListener('DOMContentLoaded', () => {
             const isStudentPage = window.location.pathname.includes('student_dashboard.html');
             
             if (isTeacherPage && data.role !== 'Teacher' && data.role !== 'Admin') {
-                window.location.href = 'student_dashboard.html';
+                const isInGPC = window.location.pathname.includes('/GPC/');
+                window.location.href = isInGPC ? '../FOR_everyOne/student_dashboard.html' : 'student_dashboard.html';
                 return;
             }
             if (isStudentPage && data.role !== 'Student' && data.role !== 'Admin') {
-                window.location.href = 'teacher_dashboard.html';
+                const isInGPC = window.location.pathname.includes('/GPC/');
+                window.location.href = isInGPC ? '../FOR_everyOne/teacher_dashboard.html' : 'teacher_dashboard.html';
                 return;
             }
+
+            currentUserRole = data.role;
 
             // 2. Map data to the UI
             updateDashboardUI(data);
@@ -121,19 +128,32 @@ function renderTimetables(list) {
                 <div class="p-3 rounded-2xl bg-blue-50 text-[#006ADC] group-hover:bg-[#006ADC] group-hover:text-white transition-colors">
                     <span class="material-symbols-outlined">calendar_today</span>
                 </div>
-                <div class="flex gap-1">
-                    ${item.is_public == 1 ? '<span class="p-2 text-green-500" title="Global"><span class="material-symbols-outlined text-xl">public</span></span>' : ''}
-                    ${item.is_public != 1 ? `<button onclick="makeGlobal(${item.id})" class="p-2 text-slate-300 hover:text-green-500 transition-colors" title="Make Global">
-                        <span class="material-symbols-outlined text-xl">public</span>
-                    </button>` : ''}
-                    <button onclick="deleteTimetable(${item.id})" class="p-2 text-slate-300 hover:text-red-500 transition-colors">
+                <div class="flex gap-1 items-center">
+                    ${
+                        (currentUserRole === 'Teacher' || currentUserRole === 'Admin')
+                        ? (item.is_public == 1
+                            ? `<button onclick="makePrivate(${item.id})" title="Make Private (click to undo global)"
+                                    class="p-2 text-green-500 hover:text-orange-500 transition-colors" >
+                                    <span class="material-symbols-outlined text-xl">public</span>
+                                </button>`
+                            : `<button onclick="makeGlobal(${item.id})" title="Make Global for all students"
+                                    class="p-2 text-slate-300 hover:text-green-500 transition-colors">
+                                    <span class="material-symbols-outlined text-xl">public</span>
+                                </button>`
+                        ) : ''
+                    }
+                    <button onclick="deleteTimetable(${item.id}, ${item.is_public})" title="Delete timetable"
+                            class="p-2 text-slate-300 hover:text-red-500 transition-colors">
                         <span class="material-symbols-outlined text-xl">delete</span>
                     </button>
                 </div>
             </div>
 
             <h3 class="text-lg font-bold text-slate-800 mb-1 group-hover:text-[#006ADC] transition-colors">${item.title}</h3>
-            <p class="text-xs font-bold text-[#006ADC] uppercase tracking-widest mb-4 bg-blue-50 inline-block px-2 py-1 rounded-lg">${item.type}</p>
+            <div class="flex items-center gap-2 mb-4">
+                <p class="text-xs font-bold text-[#006ADC] uppercase tracking-widest bg-blue-50 inline-block px-2 py-1 rounded-lg">${item.type}</p>
+                ${item.is_public == 1 ? '<span class="text-xs font-bold text-green-600 bg-green-50 px-2 py-1 rounded-lg">🌐 Global</span>' : '<span class="text-xs font-bold text-slate-400 bg-slate-50 px-2 py-1 rounded-lg">Private</span>'}
+            </div>
 
             <div class="flex items-center justify-between pt-4 border-t border-slate-50">
                 <span class="text-[10px] text-slate-400 font-medium">${new Date(item.created_at).toLocaleDateString()}</span>
@@ -147,44 +167,76 @@ function renderTimetables(list) {
     `).join('');
 }
 
-window.deleteTimetable = function(id) {
-    if (!confirm("Are you sure you want to delete this timetable?")) return;
+window.deleteTimetable = function(id, isPublic) {
+    const warningMsg = isPublic == 1
+        ? 'This timetable is currently GLOBAL. Deleting it will remove it from all student dashboards.\n\nAre you sure?'
+        : 'Are you sure you want to delete this timetable?';
+
+    if (!confirm(warningMsg)) return;
 
     fetch('../PHP/delete_timetable.php', {
         method: 'POST',
+        credentials: 'same-origin',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id: id })
     })
     .then(res => res.json())
     .then(data => {
         if (data.success) {
-            fetchTimetables(); // Refresh list
+            fetchTimetables();
         } else {
-            alert(data.error);
-        }
-    });
-};
-
-window.makeGlobal = function(id) {
-    if (!confirm("Make this timetable global? All students in your college will be able to see it.")) return;
-
-    fetch('../PHP/make_global_timetable.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: id })
-    })
-    .then(res => res.json())
-    .then(data => {
-        if (data.success) {
-            alert("✓ Timetable is now global! All students can see it.");
-            fetchTimetables(); // Refresh list
-        } else {
-            alert("Error: " + data.error);
+            alert('Error: ' + data.error);
         }
     })
     .catch(err => {
         console.error(err);
-        alert("Failed to make timetable global.");
+        alert('Failed to delete timetable.');
+    });
+};
+
+window.makeGlobal = function(id) {
+    if (!confirm('Make this timetable global?\n\nAll students in your college will see it in their College Timetable tab.')) return;
+
+    fetch('../PHP/make_global_timetable.php', {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: id })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            fetchTimetables();
+        } else {
+            alert('Error: ' + data.error);
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        alert('Failed to make timetable global.');
+    });
+};
+
+window.makePrivate = function(id) {
+    if (!confirm('Remove this timetable from students\' view?\n\nIt will become private and students will no longer see it.')) return;
+
+    fetch('../PHP/unmake_global_timetable.php', {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: id })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            fetchTimetables();
+        } else {
+            alert('Error: ' + data.error);
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        alert('Failed to make timetable private.');
     });
 };
 

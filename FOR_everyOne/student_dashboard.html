@@ -665,7 +665,7 @@
                 else if (!slot) freeSlots += 1;
             });
 
-            const pendingCount = [...teacherTasks, ...studentTasks].filter(t => t.status !== 'completed').length;
+            const pendingCount = [...teacherTasks, ...studentTasks].filter(t => t.status !== 'done').length;
 
             document.getElementById('classHours').textContent = classHours + ' hrs';
             document.getElementById('freeHours').textContent = freeSlots + ' hrs';
@@ -676,8 +676,8 @@
         function renderTaskList() {
             const container = document.getElementById('taskList');
             const allTasks = [...teacherTasks, ...studentTasks];
-            const pending = allTasks.filter(t => t.status !== 'completed');
-            const completed = allTasks.filter(t => t.status === 'completed');
+            const pending = allTasks.filter(t => t.status !== 'done');
+            const completed = allTasks.filter(t => t.status === 'done');
 
             if (allTasks.length === 0) {
                 container.innerHTML = '<div class="p-8 text-center text-slate-400">No tasks yet. Add your first task!</div>';
@@ -686,17 +686,17 @@
 
             let html = '';
 
-            // Teacher tasks (TOP, HIGH priority)
-            teacherTasks.filter(t => t.status !== 'completed').forEach(task => {
+            // Teacher tasks (TOP, HIGH priority) - pending ones first
+            teacherTasks.filter(t => t.status !== 'done').forEach(task => {
                 html += renderTaskItem(task, true);
             });
 
             // Student tasks (pending)
-            studentTasks.filter(t => t.status !== 'completed').forEach(task => {
+            studentTasks.filter(t => t.status !== 'done').forEach(task => {
                 html += renderTaskItem(task, false);
             });
 
-            // Completed
+            // Completed tasks
             completed.forEach(task => {
                 html += renderTaskItem(task, task.source === 'teacher');
             });
@@ -705,7 +705,7 @@
         }
 
         function renderTaskItem(task, isTeacher) {
-            const isCompleted = task.status === 'completed';
+            const isCompleted = task.status === 'done';
             const badge = isTeacher ?
                 '<span class="px-2 py-1 rounded-lg bg-red-100 text-red-700 text-xs font-bold">📌 Teacher Task</span>' :
                 '<span class="px-2 py-1 rounded-lg bg-purple-100 text-purple-700 text-xs font-bold">My Task</span>';
@@ -717,6 +717,14 @@
             const timeDisplay = task.planned_time ?
                 `<span class="text-xs text-slate-500">${task.planned_time} hr</span>` : '';
 
+            // Extra info for teacher tasks
+            const teacherName = (isTeacher && task.teacher_name) ?
+                `<span class="text-xs text-slate-400">by ${task.teacher_name}</span>` : '';
+            const dueDate = task.due_date ?
+                `<span class="text-xs px-2 py-0.5 rounded bg-blue-50 text-blue-600">Due: ${task.due_date}</span>` : '';
+            const description = (isTeacher && task.description) ?
+                `<p class="text-xs text-slate-500 mt-1 max-w-md">${task.description}</p>` : '';
+
             return `
                 <div class="p-4 flex items-center justify-between ${isCompleted ? 'bg-slate-50 opacity-60' : ''}">
                     <div class="flex items-center gap-4">
@@ -725,12 +733,15 @@
                         </div>
                         <div>
                             <div class="font-semibold text-slate-800 ${isCompleted ? 'line-through' : ''}">${task.title}</div>
-                            <div class="flex items-center gap-2 mt-1">
+                            <div class="flex flex-wrap items-center gap-2 mt-1">
                                 <span class="text-xs bg-slate-100 px-2 py-0.5 rounded text-slate-600">${task.subject}</span>
                                 ${badge}
                                 ${statusBadge}
                                 ${timeDisplay}
+                                ${dueDate}
+                                ${teacherName}
                             </div>
+                            ${description}
                         </div>
                     </div>
                     <div class="flex items-center gap-2">
@@ -741,7 +752,7 @@
                             </button>
                         ` : ''}
                         ${!isCompleted && isTeacher ? `
-                            <span class="text-xs text-slate-400">Teacher task - cannot delete</span>
+                            <button onclick="completeTeacherTask(${task.id})" class="px-3 py-1 rounded-lg bg-green-500 text-white text-sm font-bold hover:bg-green-600">Mark Done</button>
                         ` : ''}
                     </div>
                 </div>
@@ -804,6 +815,27 @@
                 }
             } catch (err) {
                 console.error(err);
+            }
+        };
+
+        // Complete a teacher-assigned task
+        window.completeTeacherTask = async function(taskId) {
+            try {
+                const res = await fetch('../PHP/complete_task.php', { credentials: 'same-origin',
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ task_id: taskId })
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    loadTasks();
+                } else {
+                    alert('Error: ' + (data.error || 'Failed to complete task'));
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Failed to complete task');
             }
         };
 

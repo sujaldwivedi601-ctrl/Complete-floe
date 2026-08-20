@@ -40,6 +40,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Normalize role for database
     $roleNormalized = ucfirst(strtolower($role)); // 'student' -> 'Student'
     
+    // Check if email already exists
+    $check = mysqli_prepare($conn, "SELECT id FROM user_accounts WHERE email = ?");
+    mysqli_stmt_bind_param($check, "s", $email);
+    mysqli_stmt_execute($check);
+    mysqli_stmt_store_result($check);
+    if (mysqli_stmt_num_rows($check) > 0) {
+        mysqli_stmt_close($check);
+        die("Error: This email is already registered. <a href='javascript:history.back()'>Go back</a>");
+    }
+    mysqli_stmt_close($check);
+    
     $stmt = mysqli_prepare($conn, "INSERT INTO user_accounts (user_name, email, password, number, role, institution, college_id, semester) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
     
     if ($stmt) {

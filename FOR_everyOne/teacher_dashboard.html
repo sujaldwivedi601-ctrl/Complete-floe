@@ -217,6 +217,16 @@
             loadAllStudents();
             loadAssignedTasks();
             
+            // CRITICAL: Wire up form submit to call assignTask()
+            const form = document.getElementById('assignTaskForm');
+            if (form) {
+                form.addEventListener('submit', (e) => {
+                    e.preventDefault(); // Prevent native form POST
+                    const formData = new FormData(form);
+                    assignTask(formData);
+                });
+            }
+            
             // Toggle student dropdown
             document.getElementById('taskTarget').addEventListener('change', (e) => {
                 const studentSelect = document.getElementById('studentSelectDiv');
@@ -245,7 +255,7 @@
 
         async function loadAllStudents() {
             try {
-                const res = await fetch('../PHP/get_students.php');
+                const res = await fetch('../PHP/get_students.php', { credentials: 'same-origin' });
                 const data = await res.json();
                 
                 const select = document.getElementById('taskStudent');
@@ -264,7 +274,7 @@
         async function loadStudentsBySemester(semester) {
             const semNum = semester.replace('sem', '');
             try {
-                const res = await fetch(`../PHP/get_students.php?semester=${semNum}`);
+                const res = await fetch(`../PHP/get_students.php?semester=${semNum}`, { credentials: 'same-origin' });
                 const data = await res.json();
                 
                 const select = document.getElementById('taskStudent');
@@ -306,6 +316,7 @@
             try {
                 const res = await fetch('../PHP/assign_task.php', {
                     method: 'POST',
+                    credentials: 'same-origin',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(data)
                 });
@@ -326,7 +337,7 @@
 
         async function loadAssignedTasks() {
             try {
-                const res = await fetch('../PHP/get_tasks.php');
+                const res = await fetch('../PHP/get_tasks.php', { credentials: 'same-origin' });
                 const data = await res.json();
 
                 const container = document.getElementById('assignedTasksList');

@@ -47,10 +47,15 @@ function renderTeacherList() {
     const container = document.getElementById("teacherListUI");
     if (!container) return;
     container.innerHTML = teacherList.map((t, i) => `
-        <div class="flex justify-between items-center bg-slate-50 p-3 rounded-xl border border-slate-100">
-            <span class="font-semibold text-slate-700">${t}</span>
-            <button onclick="deleteTeacher(${i})" class="text-red-400 hover:text-red-600 w-8 h-8 flex items-center justify-center">
-                <span class="material-symbols-outlined">delete</span>
+        <div class="flex justify-between items-center bg-white p-4 rounded-2xl border border-slate-100 shadow-sm group hover:border-[#006ADC]/30 transition-all">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-full bg-blue-50 text-[#006ADC] flex items-center justify-center font-bold text-xs">
+                    ${t.charAt(0).toUpperCase()}
+                </div>
+                <span class="font-semibold text-slate-700">${t}</span>
+            </div>
+            <button onclick="deleteTeacher(${i})" class="text-slate-300 hover:text-red-500 transition-colors">
+                <span class="material-symbols-outlined text-lg">delete</span>
             </button>
         </div>
     `).join("");
@@ -82,7 +87,7 @@ async function uploadPDF() {
         formData.append("pdf", fileInput.files[0]);
 
         try {
-            const response = await fetch("http://127.0.0.1:5000/upload", { method: "POST", body: formData });
+                const response = await fetch("http://127.0.0.1:5000/upload", { method: "POST", body: formData, credentials: 'same-origin' });
             const data = await response.json();
             renderSubjectTable(semValue, data);
         } catch (error) {
@@ -96,7 +101,7 @@ async function uploadPDF() {
 function renderSubjectTable(sem, data) {
     const container = document.getElementById("tablesContainer");
     const tableDiv = document.createElement("div");
-    tableDiv.className = "mb-8 p-4 border border-slate-100 rounded-2xl bg-slate-50/50";
+    tableDiv.className = "mb-10 p-6 border border-slate-100 rounded-3xl bg-slate-50/30";
 
     // Store subject data in global classSubjects for the generation engine
     if (!classSubjects[sem]) classSubjects[sem] = [];
@@ -109,33 +114,41 @@ function renderSubjectTable(sem, data) {
     });
     
     tableDiv.innerHTML = `
-        <h3 class="font-bold text-[#006ADC] mb-3">Semester ${sem} Assignments</h3>
-        <table class="w-full bg-white rounded-xl overflow-hidden shadow-sm">
-            <thead class="bg-slate-800 text-white text-[10px] uppercase">
-                <tr>
-                    <th class="p-3">Subject</th>
-                    <th class="p-3 text-center">T</th>
-                    <th class="p-3 text-center">P</th>
-                    <th class="p-3">Assign Teacher</th>
-                </tr>
-            </thead>
-            <tbody>
-                ${data.map(sub => `
-                    <tr class="border-b border-slate-50">
-                        <td class="p-3 text-sm font-medium">${sub.subject}</td>
-                        <td class="p-3 text-center text-sm">${sub.theory}</td>
-                        <td class="p-3 text-center text-sm">${sub.practical}</td>
-                        <td class="p-3">
-                            <select class="dynamic-teacher-input w-full border-slate-200 rounded-lg text-xs p-1"
-                                    data-sem="${sem}" data-subject="${sub.subject}">
-                                <option value="">-- Select --</option>
-                                ${teacherList.map(t => `<option value="${t}">${t}</option>`).join("")}
-                            </select>
-                        </td>
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="font-bold text-slate-800 flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-[#006ADC]"></span>
+                Semester ${sem} Subjects
+            </h3>
+            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">${data.length} Subjects</span>
+        </div>
+        <div class="overflow-hidden rounded-2xl border border-slate-100 shadow-sm">
+            <table class="w-full bg-white border-collapse">
+                <thead class="bg-slate-50 text-slate-500 text-[10px] uppercase tracking-wider font-bold">
+                    <tr>
+                        <th class="p-4 text-left border-b border-slate-100">Subject Name</th>
+                        <th class="p-4 text-center border-b border-slate-100 w-16">T</th>
+                        <th class="p-4 text-center border-b border-slate-100 w-16">P</th>
+                        <th class="p-4 text-left border-b border-slate-100">Assign Teacher</th>
                     </tr>
-                `).join("")}
-            </tbody>
-        </table>
+                </thead>
+                <tbody class="divide-y divide-slate-50">
+                    ${data.map(sub => `
+                        <tr class="hover:bg-slate-50/50 transition-colors">
+                            <td class="p-4 text-sm font-medium text-slate-700">${sub.subject}</td>
+                            <td class="p-4 text-center text-sm font-bold text-[#006ADC] bg-blue-50/30">${sub.theory}</td>
+                            <td class="p-4 text-center text-sm font-bold text-[#27ae60] bg-green-50/30">${sub.practical}</td>
+                            <td class="p-4">
+                                <select class="dynamic-teacher-input w-full border border-slate-200 rounded-xl text-xs p-2 outline-none focus:ring-2 focus:ring-[#006ADC]/10 focus:border-[#006ADC] transition-all"
+                                        data-sem="${sem}" data-subject="${sub.subject}">
+                                    <option value="">Choose Teacher</option>
+                                    ${teacherList.map(t => `<option value="${t}">${t}</option>`).join("")}
+                                </select>
+                            </td>
+                        </tr>
+                    `).join("")}
+                </tbody>
+            </table>
+        </div>
     `;
     container.appendChild(tableDiv);
 }
@@ -347,7 +360,8 @@ window.prepareSave = function(schedules, activeSems) {
     fetch('../PHP/save_timetable.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(dataToSave)
+        body: JSON.stringify(dataToSave),
+        credentials: 'same-origin'
     })
     .then(res => res.json())
     .then(data => {
@@ -379,7 +393,8 @@ window.publishTimetable = function(timetableId) {
     fetch('../PHP/publish_timetable.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ timetable_id: id })
+        body: JSON.stringify({ timetable_id: id }),
+        credentials: 'same-origin'
     })
     .then(res => res.json())
     .then(data => {
@@ -402,11 +417,11 @@ window.loadCollegeTimetable = async function() {
     if (!container) return;
 
     try {
-        const res = await fetch('../PHP/get_college_timetable.php');
+                const res = await fetch('../PHP/get_college_timetable.php', { credentials: 'same-origin' });
         const data = await res.json();
 
-        if (data.success && data.timetable) {
-            renderCollegeTimetable(container, data.timetable);
+        if (data.success && data.timetables && data.timetables.length > 0) {
+            renderCollegeTimetable(container, data.timetables[0]);
         } else {
             container.innerHTML = '<p class="text-slate-500">No timetable published yet.</p>';
         }
