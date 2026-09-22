@@ -28,7 +28,7 @@
     </style>
 </head>
 
-<body class="bg-slate-50 text-slate-800 min-h-screen relative">
+<body class="bg-blue-950 text-slate-800 h-screen max-w-screen  relative">
     <!-- Navigation Bar -->
     <header class="h-16 bg-white/80 backdrop-blur-md sticky top-0 z-50 w-full border-b border-slate-200">
         <div class="flex justify-between items-center w-full px-6 py-4 max-w-7xl mx-auto h-full">
@@ -37,7 +37,7 @@
                 Precision Architect
             </div>
             <nav class="hidden md:flex items-center gap-2">
-                <a class="font-semibold text-sm text-blue-700 bg-blue-50 px-4 py-2 rounded-lg" href="teacher_dashboard.html">Dashboard</a>
+                <a class="font-semibold text-sm text-white bg-blue-300 px-4 py-2 rounded-lg" href="teacher_dashboard.html">Dashboard</a>
                 <a class="font-medium text-sm text-slate-600 px-4 py-2 rounded-lg hover:bg-slate-100" href="generate_timetable.html">Generate Timetable</a>
                 <button id="logoutBtn" class="font-medium text-sm text-slate-600 px-4 py-2 rounded-lg border border-slate-200 hover:bg-slate-100">Logout</button>
             </nav>
@@ -114,82 +114,7 @@
                 </div>
 
 
-                <!-- Assign Task Section -->
-                <section class="mt-8">
-                    <div class="mb-8">
-                        <h2 class="text-3xl font-extrabold text-slate-900 tracking-tight">Assign Task</h2>
-                        <p class="text-slate-500 font-medium mt-1">Create assignments for your students.</p>
-                    </div>
-
-                    <div class="glass-panel p-8 rounded-[2rem]">
-                        <form id="assignTaskForm" class="space-y-6">
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div>
-                                    <label class="block text-sm font-bold text-slate-600 mb-2">Subject</label>
-                                    <input type="text" id="taskSubject" name="subject" required placeholder="e.g., Mathematics" 
-                                        class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-blue-400">
-                                </div>
-
-                                <div>
-                                    <label class="block text-sm font-bold text-slate-600 mb-2">Assign To</label>
-                                    <select id="taskTarget" name="target" class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-blue-400" onchange="updateTargetOptions()">
-                                        <option value="all">All Students</option>
-                                        <option value="sem1">SEM 1 Students</option>
-                                        <option value="sem2">SEM 2 Students</option>
-                                        <option value="sem3">SEM 3 Students</option>
-                                        <option value="sem4">SEM 4 Students</option>
-                                        <option value="sem5">SEM 5 Students</option>
-                                        <option value="sem6">SEM 6 Students</option>
-                                        <option value="individual">Individual Student</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div id="studentSelectDiv" class="hidden">
-                                <label class="block text-sm font-bold text-slate-600 mb-2">Select Student</label>
-                                <select id="taskStudent" name="student_id" class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-blue-400">
-                                    <option value="">Loading students...</option>
-                                </select>
-                            </div>
-
-                            <div>
-                                <label class="block text-sm font-bold text-slate-600 mb-2">Task Title</label>
-                                <input type="text" id="taskTitle" name="title" required placeholder="e.g., Chapter 5 Exercises" 
-                                    class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-400">
-                            </div>
-
-                            <div>
-                                <label class="block text-sm font-bold text-slate-600 mb-2">Description</label>
-                                <textarea id="taskDesc" name="description" rows="3" placeholder="Instructions or details..." 
-                                    class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-400"></textarea>
-                            </div>
-
-                            <div>
-                                <label class="block text-sm font-bold text-slate-600 mb-2">Due Date</label>
-                                <input type="date" id="taskDueDate" name="due_date" 
-                                    class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-400">
-                            </div>
-
-                            <button type="submit" class="w-full bg-[#006ADC] hover:bg-blue-700 text-white font-bold py-4 rounded-xl flex items-center justify-center gap-2">
-                                <span class="material-symbols-outlined">send</span>
-                                Assign Task
-                            </button>
-                        </form>
-                    </div>
-                </section>
-
-                <!-- Assigned Tasks List -->
-                <section class="mt-8">
-                    <div class="mb-8">
-                        <h2 class="text-3xl font-extrabold text-slate-900 tracking-tight">Assigned Tasks</h2>
-                        <p class="text-slate-500 font-medium mt-1">View and manage student tasks.</p>
-                    </div>
-
-                    <div id="assignedTasksList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        <p class="text-slate-400 col-span-full">Loading tasks...</p>
-                    </div>
-                </section>
-
+              
                 <!-- CTA Section -->
                 <div class="relative mt-8 rounded-[2.5rem] p-10 md:p-14 text-white overflow-hidden shadow-[0_20px_40px_-15px_rgba(79,70,229,0.5)] flex flex-col md:flex-row justify-between items-center gap-8 group">
                     <div class="absolute inset-0 bg-gradient-to-r from-blue-600 to-indigo-700 z-0 transition-transform duration-500 group-hover:scale-105"></div>
